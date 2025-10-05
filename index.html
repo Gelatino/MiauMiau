@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LTFA — Loading…</title>
+  <link rel="icon" type="image/png" href="https://github.com/Gelatino/Portfolio/blob/main/assets/img/GatoGatito.png?raw=true" />
+  <link rel="prefetch" href="LTFA.html" />
+  <style>
+    html, body { height: 100%; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #000;
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      transition: opacity .4s linear;
+      overflow: hidden;
+    }
+    body.fade { opacity: 0; }
+    .splash-wrap {
+      width: 40%;
+      overflow: hidden;
+      display: flex;
+      justify-content: flex-start;
+    }
+    img.splash {
+      width: 100%; /* crop ~5% on the right */
+      height: auto;
+      object-fit: cover;
+      object-position: right center;
+      image-rendering: -webkit-optimize-contrast;
+      margin-left: -2%;
+    }
+  </style>
+  <noscript>
+    <meta http-equiv="refresh" content="6; url=LTFA.html">
+  </noscript>
+</head>
+<body>
+  <div class="splash-wrap">
+    <img
+      id="splash"
+      class="splash"
+      alt="LTFA intro"
+      src="https://github.com/Gelatino/Portfolio/blob/main/assets/img/Maiumiau.gif?raw=true"
+      data-duration-ms="6000" />
+  </div>
+
+  <script>
+    const REDIRECT_URL = 'LTFA.html';
+    const defaultDurationMs = 6000;
+
+    (function () {
+      const img = document.getElementById('splash');
+      const msAttr = img.getAttribute('data-duration-ms');
+      const duration = Number.isFinite(+msAttr) ? parseInt(msAttr, 10) : defaultDurationMs;
+
+      function startTimer() {
+        setTimeout(() => {
+          document.body.classList.add('fade');
+          setTimeout(() => { window.location.href = REDIRECT_URL; }, 400);
+        }, duration);
+      }
+
+      if (img.complete) {
+        startTimer();
+      } else {
+        img.addEventListener('load', startTimer, { once: true });
+        img.addEventListener('error', () => {
+          window.location.href = REDIRECT_URL;
+        }, { once: true });
+      }
+    })();
+  </script>
+</body>
+</html>
