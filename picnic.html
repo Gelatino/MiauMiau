@@ -166,8 +166,7 @@
  
     <div class="copy">
     Invite others, the merrier the more.
-    </div>
-
+  </div>
     <footer>
       <span>Pic-Nic</span>
       <span>18.07.26</span>
@@ -176,12 +175,12 @@
 
 <script>
   var letters = [
-    {el:"L0", sx:16, sy:24, srot:-12},
-    {el:"L1", sx:51, sy:10, srot: 8},
-    {el:"L2", sx:80, sy:30, srot:-6},
-    {el:"L3", sx:30, sy:70, srot:10},
-    {el:"L4", sx:57, sy:78, srot:-8},
-    {el:"L5", sx:78, sy:80, srot: 6}
+    {el:"L0", sx:10, sy:24, srot:-12},
+    {el:"L1", sx:40, sy:10, srot: 8},
+    {el:"L2", sx:70, sy:30, srot:-6},
+    {el:"L3", sx:6, sy:60, srot:10},
+    {el:"L4", sx:40, sy:70, srot:-8},
+    {el:"L5", sx:60, sy:65, srot: 6}
   ];
 
   function targets(){
@@ -202,6 +201,15 @@
   function vw(p){return window.innerWidth*p/100;}
   function vh(p){return window.innerHeight*p/100;}
 
+  // Keep a letter's start X on-screen: clamp so its right edge never
+  // crosses the viewport. letterW is an estimate of the glyph width.
+  function clampX(px, letterW){
+    var maxX = window.innerWidth - letterW - 10; // 10px right margin
+    if(px > maxX) return maxX;
+    if(px < 8) return 8;
+    return px;
+  }
+
   function setLetters(progress){
     var T = targets(), t = T.pos;
     var p = Math.max(0, Math.min(1, progress));
@@ -209,12 +217,13 @@
 
     letters.forEach(function(L,i){
       var el = document.getElementById(L.el);
-      var startX = vw(L.sx), startY = vh(L.sy);
+      var startPx = (25/100)*Math.min(window.innerWidth,window.innerHeight) + 30;
+      var fsPx = startPx + (t[i].size-startPx)*e;
+      var letterW = fsPx * 0.7;             // rough glyph width at this size
+      var startX = clampX(vw(L.sx), letterW), startY = vh(L.sy);
       var x = startX + (t[i].x-startX)*e;
       var y = startY + (t[i].y-startY)*e;
       var rot = L.srot + (0-L.srot)*e;
-      var startPx = (17/100)*Math.min(window.innerWidth,window.innerHeight) + 30;
-      var fsPx = startPx + (t[i].size-startPx)*e;
       el.style.fontSize = fsPx + "px";
       el.style.transform = "translate("+x+"px,"+y+"px) rotate("+rot+"deg)";
     });
