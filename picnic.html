@@ -71,6 +71,11 @@
     font-family:"Caveat",cursive;font-weight:700;
     font-size:clamp(34px,9vw,52px);line-height:1;color:var(--yellow);
   }
+  .info .forecast-row{margin-top:4px}
+  .info .forecast-row .val{
+    font-size:clamp(24px,6vw,34px);
+    line-height:1.05;
+  }
 
   /* copy: blue, Caveat, like the date + place. wider now. */
   .copy{
@@ -79,6 +84,10 @@
     font-size:clamp(26px,6.5vw,40px);line-height:1.25;
     max-width:34ch;margin:30px 0;
   }
+  .copy ul{margin:.12em 0 0 1.1em;padding:0}
+  .copy li{margin:0;line-height:1.05}
+  .copy li::marker{font-size:.65em}
+  .copy .invite-line{display:block;text-align:right}
 
   .links{margin-top:24px;position:relative;z-index:2}
   .links a{
@@ -103,7 +112,7 @@
   .figures{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
   .figure{position:absolute;height:auto}
   .figure img{width:100%;height:auto;display:block}
-  #F0{width:190px}   /* chair */
+  #F0{width:200px}   /* chair */
   #F1{width:200px}   /* flower */
 
   @media (prefers-reduced-motion: reduce){.letter{transition:none}}
@@ -130,10 +139,10 @@
 
   <div class="content">
     <div class="figures" id="figures">
-      <div class="figure" id="F0" style="left:74%; top:60%; transform:rotate(0deg)">
+      <div class="figure" id="F0" style="left:64%; top:70%; transform:rotate(0deg)">
         <img src="img/picnic/silla.png" alt="">
       </div>
-      <div class="figure" id="F1" style="left:70%; top:8%; transform:rotate(0deg)">
+      <div class="figure" id="F1" style="left:65%; top:5%; transform:rotate(0deg)">
         <img src="img/picnic/flor.png" alt="">
       </div>
     </div>
@@ -149,10 +158,15 @@
         <span class="lbl">Where</span>
         <span class="val">Rosengarten Pankow</span>
       </div>
+      <div class="row forecast-row">
+        <span class="lbl">Forecast</span>
+        <span class="val" id="forecast-value">Loading forecast...</span>
+      </div>
     </div>
 
     <div class="copy">
-      Pic-Nic is an event brought to you by a partnership between Sweden and Mexico. Please bring whatever you'd like to eat, drink, and share. We have the tequila, the crown of flowers, the music, the vibes and the laughs. Invite others, the merrier the more.
+      Pic-Nic is an event brought to you by a partnership between Sweden and Mexico. Please bring whatever you'd like to eat, drink, and share. We have the tequila, the crown of flowers, the music, the vibes and the laughs.
+      <br><span class="invite-line">Invite others, the merrier the more</span>
     </div>
 
     <div class="links">
@@ -165,8 +179,16 @@
     </div>
  
     <div class="copy">
-    Invite others, the merrier the more.
-  </div>
+       Bring food, drinks, and if you can, one of these:
+      <ul>
+        <li>Candle for the night</li>
+        <li>Prize for the piñata</li>
+        <li>Flowers for the crown</li>
+      </ul>
+    </div>
+    <div class="links">
+ <a href="https://maps.app.goo.gl/U5o6ptUchwnsBVZS7" target="_blank" rel="noopener">After Pic-Nic: Roderich &rarr;</a>
+    </div>
     <footer>
       <span>Pic-Nic</span>
       <span>18.07.26</span>
@@ -247,6 +269,57 @@
   }
   window.addEventListener("scroll", onScroll, {passive:true});
   window.addEventListener("resize", onScroll);
+
+  var hasInteracted = false;
+  function markInteracted(){
+    hasInteracted = true;
+  }
+
+  window.addEventListener("wheel", markInteracted, {passive:true, once:true});
+  window.addEventListener("touchstart", markInteracted, {passive:true, once:true});
+  window.addEventListener("keydown", markInteracted, {once:true});
+  window.addEventListener("mousedown", markInteracted, {once:true});
+  window.addEventListener("scroll", function(){
+    if(window.scrollY > 2) hasInteracted = true;
+  }, {passive:true, once:true});
+
+  var AUTO_SCROLL_DURATION_MS = 1400;
+  var AUTO_SCROLL_TARGET = 0.9;
+
+  function animateScrollTo(targetY, durationMs){
+    var startY = window.scrollY;
+    var delta = targetY - startY;
+    if(Math.abs(delta) < 1) return;
+
+    var startTime = null;
+    function easeInOutQuad(t){
+      return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2)/2;
+    }
+
+    function tick(ts){
+      if(startTime === null) startTime = ts;
+      var elapsed = ts - startTime;
+      var p = Math.min(1, elapsed / durationMs);
+      var eased = easeInOutQuad(p);
+      window.scrollTo(0, startY + delta * eased);
+      if(p < 1 && !hasInteracted){
+        requestAnimationFrame(tick);
+      }
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  setTimeout(function(){
+    if(hasInteracted || window.scrollY > 2) return;
+    var targetY = window.innerHeight * AUTO_SCROLL_TARGET;
+    if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+      window.scrollTo(0, targetY);
+      return;
+    }
+    animateScrollTo(targetY, AUTO_SCROLL_DURATION_MS);
+  }, 2500);
+
   setLetters(0); onScroll();
 
   var title="Pic-Nic";
@@ -254,6 +327,74 @@
   var place="Rosengarten Pankow, Berlin";
   var start="20260718T160000Z";
   var end="20260718T200000Z";
+
+  function weatherCodeLabel(code){
+    if(code === 0) return "Clear";
+    if(code === 1 || code === 2) return "Partly cloudy";
+    if(code === 3) return "Cloudy";
+    if(code === 45 || code === 48) return "Fog";
+    if(code === 51 || code === 53 || code === 55) return "Drizzle";
+    if(code === 61 || code === 63 || code === 65) return "Rain";
+    if(code === 71 || code === 73 || code === 75) return "Snow";
+    if(code === 80 || code === 81 || code === 82) return "Rain showers";
+    if(code === 95 || code === 96 || code === 99) return "Thunderstorm";
+    return "Mixed weather";
+  }
+
+  function loadLiveForecast(){
+    var forecastEl = document.getElementById("forecast-value");
+    if(!forecastEl) return;
+
+    var forecastDate = "2026-07-18";
+    var forecastTime = "18:00";
+    var targetDateTime = forecastDate + "T" + forecastTime;
+
+    var lat = 52.5565;
+    var lon = 13.4208;
+    var apiUrl =
+      "https://api.open-meteo.com/v1/forecast"+
+      "?latitude=" + lat +
+      "&longitude=" + lon +
+      "&hourly=temperature_2m,precipitation_probability,weather_code"+
+      "&timezone=Europe%2FBerlin"+
+      "&start_date=" + forecastDate +
+      "&end_date=" + forecastDate;
+
+    fetch(apiUrl)
+      .then(function(res){
+        if(!res.ok) throw new Error("Forecast request failed");
+        return res.json();
+      })
+      .then(function(data){
+        var hourly = data && data.hourly ? data.hourly : null;
+        if(!hourly || !hourly.time || !hourly.temperature_2m || !hourly.weather_code){
+          throw new Error("Missing forecast data");
+        }
+
+        var idx = hourly.time.indexOf(targetDateTime);
+        if(idx === -1){
+          idx = hourly.time.findIndex(function(t){
+            return typeof t === "string" && t.slice(11,16) === forecastTime;
+          });
+        }
+        if(idx === -1) throw new Error("Target time not found");
+
+        var temp = Math.round(hourly.temperature_2m[idx]);
+        var rainChance = hourly.precipitation_probability && hourly.precipitation_probability[idx] != null
+          ? Math.round(hourly.precipitation_probability[idx])
+          : null;
+        var weatherText = weatherCodeLabel(hourly.weather_code[idx]);
+
+        forecastEl.textContent = rainChance == null
+          ? temp + "C \u00B7 " + weatherText
+          : temp + "C \u00B7 " + weatherText + " \u00B7 " + rainChance + "% Rain chance";
+      })
+      .catch(function(){
+        forecastEl.textContent = "Forecast unavailable";
+      });
+  }
+
+  loadLiveForecast();
 
   document.getElementById("gcal").href =
     "https://calendar.google.com/calendar/render?action=TEMPLATE"+
