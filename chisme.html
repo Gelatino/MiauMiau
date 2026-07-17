@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHISME</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Archivo:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#9E2317;
+    --yellow:#F4C430;
+    --green:#3C7A4E;
+    --blue:#3F6FD1;
+    --pink:#E0608E;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:var(--red);color:var(--yellow);
+    font-family:"Archivo","Helvetica Neue",Arial,sans-serif;
+    line-height:1.3;overflow-x:hidden;min-height:100vh;
+  }
+  .grain{
+    position:fixed;inset:0;pointer-events:none;z-index:60;
+    opacity:.06;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+  .wrap{max-width:680px;margin:0 auto;padding:0 24px 90px;position:relative;z-index:30}
+
+  header.bar{
+    position:sticky;top:0;z-index:50;background:var(--red);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 0 10px;border-bottom:1px solid rgba(244,196,48,.3);
+  }
+  .brand{font-family:"Caveat",cursive;font-weight:700;font-size:34px;line-height:1;color:var(--yellow)}
+  .burger{
+    background:none;border:1px solid rgba(244,196,48,.4);color:var(--yellow);
+    width:40px;height:40px;cursor:pointer;
+    display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;
+  }
+  .burger span{display:block;width:18px;height:2px;background:var(--yellow)}
+
+  /* ---- top strip: MY points + MY rank only ---- */
+  .strip{
+    display:flex;border-bottom:1px solid rgba(244,196,48,.3);
+    font-size:13px;letter-spacing:2px;text-transform:uppercase;font-weight:700;
+    position:sticky;top:65px;background:var(--red);z-index:49;
+  }
+  .strip > div{flex:1;padding:10px 0;text-align:center;position:relative}
+  .strip .n{
+    display:block;font-family:"Caveat",cursive;font-size:30px;letter-spacing:0;
+    text-transform:none;line-height:1;margin-top:2px;color:var(--yellow);
+  }
+  .strip .n.bump{animation:bump .4s ease}
+  @keyframes bump{
+    0%{transform:scale(1)}
+    40%{transform:scale(1.35)}
+    100%{transform:scale(1)}
+  }
+  .sync{
+    position:absolute;right:4px;top:8px;width:6px;height:6px;border-radius:50%;
+    background:var(--green);opacity:0;transition:opacity .2s;
+  }
+  .sync.on{opacity:1}
+  .sync.err{background:var(--pink);opacity:1}
+
+  .menu{
+    position:fixed;inset:0;background:var(--red);z-index:55;
+    display:none;flex-direction:column;justify-content:center;padding:24px;
+  }
+  .menu.open{display:flex}
+  .menu a{
+    color:var(--yellow);font-weight:700;font-size:clamp(28px,9vw,44px);
+    text-transform:uppercase;letter-spacing:1px;text-decoration:none;
+    padding:14px 0;border-bottom:1px solid rgba(244,196,48,.3);cursor:pointer;
+  }
+  .menu a:hover{padding-left:14px}
+  .menu .close{
+    position:absolute;top:18px;right:24px;font-size:34px;border:none;background:none;
+    color:var(--yellow);cursor:pointer;font-family:"Caveat",cursive;
+  }
+
+  h2.screen-title{
+    font-family:"Caveat",cursive;font-weight:700;
+    font-size:clamp(40px,11vw,62px);line-height:1;margin:28px 0 6px;color:var(--yellow);
+  }
+  h2.screen-title.guess-title{
+    text-align:right;
+    font-size:clamp(28px,7vw,40px);
+    margin:16px 0 10px;
+  }
+  .lbl{
+    display:block;font-size:13px;letter-spacing:2px;font-weight:700;
+    text-transform:uppercase;color:var(--yellow);margin-bottom:6px;
+  }
+  .copy{
+    font-family:"Caveat",cursive;font-weight:600;color:var(--blue);
+    font-size:clamp(24px,5.5vw,34px);line-height:1.25;max-width:34ch;margin:16px 0;
+  }
+  .note{font-size:14px;opacity:.75;margin-top:6px;line-height:1.4}
+
+  input[type=text],input[type=password],input[type=tel],textarea{
+    width:100%;background:transparent;border:1px solid rgba(244,196,48,.4);
+    color:var(--yellow);padding:12px;font-family:"Archivo",sans-serif;font-size:17px;
+  }
+  input::placeholder,textarea::placeholder{color:rgba(244,196,48,.4)}
+  input:focus,textarea:focus{outline:2px solid var(--yellow);outline-offset:1px}
+  textarea{resize:vertical;min-height:76px}
+
+  /* pin: 4 big boxes */
+  input.pin{
+    letter-spacing:.7em;font-size:26px;text-align:center;
+    font-family:"Archivo",monospace;padding:14px 12px;
+  }
+
+  button.act{
+    background:var(--yellow);color:var(--red);border:none;
+    font-family:"Archivo",sans-serif;font-weight:700;font-size:16px;
+    text-transform:uppercase;letter-spacing:2px;padding:14px 22px;cursor:pointer;width:100%;
+  }
+  button.act:hover{opacity:.9}
+  button.act:disabled{opacity:.35;cursor:not-allowed}
+  button.ghost{background:transparent;color:var(--yellow);border:1px solid rgba(244,196,48,.5)}
+  .field{margin-bottom:18px}
+  .back{
+    background:none;border:none;color:var(--yellow);opacity:.6;cursor:pointer;
+    font-family:"Archivo";font-size:14px;letter-spacing:1px;text-transform:uppercase;
+    padding:10px 0;font-weight:700;
+  }
+
+  .card{border:1px solid rgba(244,196,48,.35);padding:18px;margin-bottom:14px}
+  .card .chisme{
+    font-family:"Caveat",cursive;font-weight:600;color:var(--blue);
+    font-size:clamp(26px,6vw,36px);line-height:1.2;margin-bottom:18px;
+  }
+  .card .chisme.guess-fact{
+    font-size:clamp(34px,8vw,50px);
+    line-height:1.1;
+  }
+
+  /* ---- the live stake: one big number, ticks down on each miss ---- */
+  .stake{
+    display:flex;align-items:baseline;gap:10px;margin-bottom:16px;
+    padding-bottom:14px;border-bottom:1px solid rgba(244,196,48,.2);
+  }
+  .stake .amt{
+    font-family:"Caveat",cursive;font-weight:700;font-size:56px;line-height:.9;
+    color:var(--yellow);display:inline-block;
+  }
+  .stake .amt.drop{animation:drop .45s ease}
+  @keyframes drop{
+    0%{transform:translateY(-14px) scale(1.25);opacity:0}
+    55%{transform:translateY(3px) scale(.95);opacity:1}
+    100%{transform:translateY(0) scale(1);opacity:1}
+  }
+  .stake .amt.neg{color:var(--pink)}
+  .stake .cap{
+    font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:700;opacity:.75;
+  }
+  .tries{display:flex;gap:6px;margin-left:auto}
+  .try{
+    width:22px;height:22px;border:1px solid rgba(244,196,48,.4);
+    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;
+  }
+  .try.used{background:var(--pink);color:var(--red);border-color:var(--pink)}
+
+  /* ---------- filtering name picker ---------- */
+  .picker{position:relative;margin:14px 0 12px}
+  .picker-list{
+    border:1px solid rgba(244,196,48,.4);border-top:none;
+    max-height:200px;overflow-y:auto;background:var(--red);
+  }
+  .picker-list button{
+    display:block;width:100%;text-align:left;background:none;border:none;
+    color:var(--yellow);font-family:"Caveat",cursive;font-size:26px;
+    padding:10px 12px;cursor:pointer;border-bottom:1px solid rgba(244,196,48,.12);
+  }
+  .picker-list button:last-child{border-bottom:none}
+  .picker-list button:active,.picker-list button:hover{background:var(--yellow);color:var(--red)}
+  .picker-list .none{padding:12px;font-size:14px;opacity:.6;font-family:"Archivo"}
+  .guess-controls{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 150px;
+    gap:10px;
+    align-items:start;
+    margin:14px 0 12px;
+  }
+  .guess-controls .picker{margin:0}
+  .guess-actions{display:flex;flex-direction:column;gap:8px}
+  .guess-actions .act{white-space:normal;padding:12px 14px}
+  @media (max-width:640px){
+    .guess-controls{grid-template-columns:1fr}
+  }
+  .chosen{
+    display:flex;align-items:center;justify-content:space-between;
+    border:1px solid var(--yellow);padding:8px 12px;
+  }
+  .chosen b{font-family:"Caveat",cursive;font-size:30px;font-weight:700;line-height:1.1}
+  .chosen button{
+    background:none;border:none;color:var(--yellow);font-size:26px;cursor:pointer;
+    font-family:"Caveat",cursive;opacity:.7;padding:0 4px;line-height:1;
+  }
+
+  table{width:100%;border-collapse:collapse;margin-top:10px}
+  th{
+    text-align:left;font-size:12px;letter-spacing:2px;text-transform:uppercase;
+    padding:8px 4px;border-bottom:1px solid rgba(244,196,48,.3);font-weight:700;
+  }
+  td{padding:10px 4px;border-bottom:1px solid rgba(244,196,48,.15)}
+  td.name{font-family:"Caveat",cursive;font-size:26px;line-height:1}
+  td.pts{text-align:right;font-family:"Caveat",cursive;font-size:26px;font-weight:700}
+  tr.you td{color:var(--yellow)}
+  tr.you td.name::after{content:" (you)";font-size:13px;font-family:"Archivo";opacity:.6}
+
+  .rules-t{width:100%;border-collapse:collapse;margin:14px 0 6px;font-size:15px}
+  .rules-t th{font-size:11px;letter-spacing:1px;padding:8px 3px}
+  .rules-t td{padding:9px 3px;font-weight:600}
+  .rules-t td:first-child{font-size:13px;text-transform:uppercase;letter-spacing:1px}
+  .pos{color:var(--yellow)}
+  .neg{color:var(--pink)}
+  .zero{opacity:.4}
+
+  .msg{padding:12px;border:1px solid var(--yellow);margin-bottom:16px;font-size:15px}
+  .msg.bad{border-color:var(--pink);color:var(--pink)}
+  .hidden{display:none !important}
+  .step-dots{display:flex;gap:6px;justify-content:center;margin:20px 0}
+  .step-dots i{width:8px;height:8px;border:1px solid var(--yellow);border-radius:50%}
+  .step-dots i.on{background:var(--yellow)}
+
+  .boot{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;
+    gap:16px;
+    font-family:"Caveat",cursive;font-size:40px;color:var(--yellow);text-align:center;
+  }
+  .boot img{
+    width:min(42vw,220px);
+    height:auto;
+  }
+  .gate{padding-top:8vh}
+  .gate .brand-big{
+    text-align: center;
+    font-family:"Caveat",cursive;font-weight:700;
+    font-size:clamp(64px,20vw,110px);line-height:.9;margin-bottom:8px;
+  }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<nav class="menu" id="menu">
+  <button class="close" onclick="closeMenu()">&times;</button>
+  <a onclick="go('guess')">Guess</a>
+  <a onclick="go('submit')">Add chisme</a>
+  <a onclick="go('board')">Leaderboard</a>
+  <a onclick="go('rules')">Rules</a>
+</nav>
+
+<div class="wrap">
+  <header class="bar hidden" id="bar">
+    <span class="brand">Chisme</span>
+    <button class="burger" onclick="openMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
+  </header>
+
+  <!-- CHANGE 3: my points + my rank only -->
+  <div class="strip hidden" id="strip">
+    <div>Your points<span class="n" id="s-me">0</span></div>
+    <div>Your place<span class="n" id="s-rank">-</span><i class="sync" id="sync"></i></div>
+  </div>
+
+  <div id="app"><div class="boot"><img src="img/picnic/silla.png" alt="Silla"><span>Loading the chisme...</span></div></div>
+</div>
+
+<script>
+/* ==================================================================
+   ============  1. CONNECTION  =====================================
+   ==================================================================
+
+   Paste your Apps Script /exec URL here. See Code.gs for how to get it.
+   Must end in /exec, not /dev.                                        */
+
+const API_URL = 'https://script.google.com/macros/s/AKfycbxyWokyjwUmmohRKk5ZxXtObaL7nJ2vR33BQmwCZBR2Wcq6dWbBlmc2xon2qyVtrSeA/exec';
+
+const POLL_MS = 5000;    // how often to check the Sheet for other people's moves
+
+
+/* ==================================================================
+   ============  2. RULES + POINT SYSTEM  ===========================
+   ============  EVERYTHING TUNABLE LIVES HERE  =====================
+   ==================================================================
+
+   Change any number here and the game + the Rules screen both update.
+   Nothing is hardcoded anywhere else.
+
+   NOTE: scores are replayed from the event log, so changing these
+   numbers mid-game recomputes everyone's whole history with the new
+   values. Change them before the picnic, not during.                 */
+
+const RULES = {
+
+  /* --- SIGNING UP -----------------------------------------------
+     Each player starts with START_POINTS.
+     Each player joining adds HOUSE_PER_PLAYER to the house.
+     Sign-up chismes are FREE: they cost the house nothing.
+
+     HOUSE_PER_PLAYER=8 gives roughly 5 guesses each for a group that
+     knows each other well, ~17 each for near-strangers. Raise it for
+     a longer game.                                                   */
+  START_POINTS:        5,
+  HOUSE_PER_PLAYER:    8,
+  JOIN_CHISMES:        3,
+  JOIN_CHISMES_FREE:   true,
+
+  /* Placeholder prompts on the signup screen. One per chisme.
+     Add or remove freely: the screen builds itself from this list,
+     and JOIN_CHISMES above controls how many boxes appear.           */
+  JOIN_PROMPTS: [
+    "Tell us your nickname",
+    "What colour are your shoes right now?",
+    "Any visible tattoo?"
+  ],
+
+  /* --- WRITING AN EXTRA CHISME ----------------------------------
+     After signing up, adding a chisme pays you and drains the house.
+     This is the main faucet: the house dies of generosity.           */
+  EXTRA_CHISME_WRITER:  +2,
+  EXTRA_CHISME_HOUSE:   -2,
+
+  /* --- GUESSING -------------------------------------------------
+     3 tries per fact. Every row sums to ZERO (conserved economy).
+
+     Design logic, so you know what you'd break by editing:
+
+      - Guesser payout MUST fall 3 > 2 > 1. If a later try paid more,
+        someone who knows the answer would miss on purpose to farm it.
+        The guesser picks which try they win on, so this column can
+        only ever decrease.
+
+      - Writer payout peaks at TRY 3 (-2, 0, +2) and goes negative on
+        total failure (-1). An obvious chisme loses you money. An
+        unguessable one also loses you money. Only the sweet spot pays.
+        This is the whole reason the game works.
+
+      - House pays for every crack, rakes every total failure.         */
+  PAYOUT: {
+    try1:  { guesser: +3, writer: -2, house: -1 },
+    try2:  { guesser: +2, writer:  0, house: -2 },
+    try3:  { guesser: +1, writer: +2, house: -3 },
+    fail:  { guesser: -1, writer: -1, house: +2 },
+
+    /* CHANGE 6: skip costs the same as three misses.
+       Heads up: this makes skipping strictly worse than guessing,
+       since 3 tries cost the same as walking away. Nobody rational
+       will tap it. If it turns out dead at the picnic, set
+       guesser: 0 here and it becomes free again. Row must sum to 0. */
+    skip:  { guesser: -1, writer: -1, house: +2 }
+  },
+
+  /* --- LIMITS ---------------------------------------------------  */
+  MAX_TRIES:        3,
+  LOCK_BELOW:       0,
+  ALLOW_OWN_FACTS:  false,
+  RETRY_SAME_FACT:  false,
+
+  PIN_LENGTH:       4
+};
+
+
+/* ==================================================================
+   ============  3. IDENTITY  =======================================
+   ==================================================================
+
+   Each browser generates a random device ID on first visit and keeps it
+   in localStorage. Random once, then saved forever: that's the silent
+   way back in, no typing.
+
+   The PIN only matters if the ID is gone (different browser, cleared
+   data, opened from a link preview instead of the QR). Then they use
+   "I'm already playing", pick their name from the list, and type it.
+
+   It is not security. It stops accidents, not attackers.             */
+
+const DEVICE_KEY = 'chisme_device_id';
+
+function deviceId(){
+  let id = localStorage.getItem(DEVICE_KEY);
+  if(!id){
+    id = 'd_' + Date.now().toString(36) + Math.random().toString(36).slice(2,9);
+    localStorage.setItem(DEVICE_KEY, id);
+  }
+  return id;
+}
+
+let MY_ID = localStorage.getItem('chisme_my_id') || null;
+
+
+/* ==================================================================
+   ============  4. STORAGE: the Google Sheet  ======================
+   ==================================================================
+
+   PLAYERS: one row per person, written once.
+   EVENTS:  append-only log. Nothing overwritten, so two people acting
+            at the same second can't clobber each other.
+
+   POSTs are text/plain on purpose: that makes them a "simple request"
+   so the browser skips the CORS preflight, which Apps Script can't
+   answer.                                                             */
+
+let PLAYERS = [];
+let EVENTS  = [];
+let syncing = false;
+
+function flash(state){
+  const el = document.getElementById('sync');
+  if(!el) return;
+  el.className = 'sync ' + (state || '');
+  if(state === 'on') setTimeout(()=>{ el.className = 'sync'; }, 600);
+}
+
+async function pull(){
+  try{
+    const res  = await fetch(API_URL, { method:'GET' });
+    const data = await res.json();
+    if(data.ok){
+      PLAYERS = data.players || [];
+      EVENTS  = data.events  || [];
+      flash('on');
+      return true;
+    }
+    flash('err'); return false;
+  }catch(e){
+    flash('err'); return false;
+  }
+}
+
+async function postJSON(body){
+  const res = await fetch(API_URL, {
+    method:'POST',
+    headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+    body: JSON.stringify(body)
+  });
+  return res.json();
+}
+
+async function pushPlayer(id, name, pin){
+  try{
+    const r = await postJSON({ kind:'player', id, name, pin: String(pin) });
+    flash(r.ok ? 'on' : 'err');
+    return r;
+  }catch(e){
+    flash('err');
+    return { ok:false, error:'network' };
+  }
+}
+
+/* Pass an array to send them all in ONE round trip. */
+async function pushEvents(list){
+  list.forEach(e => EVENTS.push(e));           // optimistic: show it now
+  try{
+    await postJSON(list.length === 1 ? list[0] : { events:list });
+    flash('on');
+  }catch(e){
+    flash('err');
+  }
+}
+
+const mkEvent = (type, actor, target, payload) =>
+  ({ ts: Date.now(), type, actor, target: target || '', payload: payload || {} });
+
+
+/* ==================================================================
+   ============  5. REPLAY: players + log -> game state  ============
+   ==================================================================
+
+   Points are never stored. They're computed by replaying every event in
+   timestamp order. Events are sorted by ts, so sheet row order doesn't
+   matter and a hand-edited row can't silently drop a fact.            */
+
+function replay(){
+  const S = { players:{}, facts:{}, house:0 };
+
+  for(const p of PLAYERS){
+    if(S.players[p.id]) continue;
+    S.players[p.id] = {
+      id:p.id, name:p.name, pin:String(p.pin),
+      pts: RULES.START_POINTS
+    };
+    S.house += RULES.HOUSE_PER_PLAYER;
+  }
+
+  const log = [...EVENTS].sort((a,b) => (a.ts||0) - (b.ts||0));
+
+  for(const ev of log){
+    const p = ev.payload || {};
+
+    if(ev.type === 'fact'){
+      const owner = S.players[ev.actor];
+      if(!owner) continue;
+      if(S.facts[p.id]) continue;
+      S.facts[p.id] = { id:p.id, owner:ev.actor, text:p.text, live:true, tried:[], state:{} };
+      if(!p.free){
+        owner.pts += RULES.EXTRA_CHISME_WRITER;
+        S.house   += RULES.EXTRA_CHISME_HOUSE;
+      }
+    }
+
+    if(ev.type === 'skip'){
+      const f = S.facts[p.factId];
+      if(!f || !f.live) continue;
+      const skipper = S.players[ev.actor];
+      const writer  = S.players[f.owner];
+      if(!skipper || !writer) continue;
+      if(f.tried.includes(ev.actor)) continue;
+
+      const row = RULES.PAYOUT.skip;
+      skipper.pts += row.guesser;
+      writer.pts  += row.writer;
+      S.house     += row.house;
+      f.tried.push(ev.actor);                   // burned for them, live for everyone else
+    }
+
+    if(ev.type === 'guess'){
+      const f = S.facts[p.factId];
+      if(!f || !f.live) continue;
+      const guesser = S.players[ev.actor];
+      const writer  = S.players[f.owner];
+      if(!guesser || !writer) continue;
+      if(f.tried.includes(ev.actor)) continue;
+
+      f.state[ev.actor] = f.state[ev.actor] || { tries:0 };
+      f.state[ev.actor].tries++;
+      const n = f.state[ev.actor].tries;
+
+      if(p.hit){
+        const row = RULES.PAYOUT['try' + n];
+        if(!row) continue;
+        guesser.pts += row.guesser;
+        writer.pts  += row.writer;
+        S.house     += row.house;
+        f.live = false;
+        f.crackedBy = ev.actor;
+      } else if(n >= RULES.MAX_TRIES){
+        const row = RULES.PAYOUT.fail;
+        guesser.pts += row.guesser;
+        writer.pts  += row.writer;
+        S.house     += row.house;
+        f.tried.push(ev.actor);
+      }
+    }
+  }
+
+  S.factList   = Object.values(S.facts);
+  S.playerList = Object.values(S.players);
+  return S;
+}
+
+
+/* ==================================================================
+   ============  6. GAME STATE + HELPERS  ===========================
+   ================================================================== */
+
+let S    = { players:{}, facts:{}, factList:[], playerList:[], house:0 };
+let view = 'guess';
+let gate = 'home';                 // home | signup | chismes | login
+let draft = { name:'', pin:'', chismes:[] };
+let current = null;
+let booted  = false;
+let lastPts = null;                // for the score bump animation
+
+const norm = s => String(s||'').trim().toLowerCase()
+  .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+
+const uid = () => 'f' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const esc = s => String(s).replace(/[&<>"']/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function me(){ return S.players[MY_ID]; }
+function nameOf(id){ return S.players[id] ? S.players[id].name : '?'; }
+function liveFacts(){ return S.factList.filter(f => f.live); }
+function locked(){ return me() && me().pts < RULES.LOCK_BELOW; }
+function gameOver(){ return S.playerList.length > 0 && S.house <= 0; }
+
+function myRank(){
+  const sorted = [...S.playerList].sort((a,b)=>b.pts-a.pts);
+  const i = sorted.findIndex(p => p.id === MY_ID);
+  return i < 0 ? '-' : ordinal(i+1);
+}
+function ordinal(n){
+  const s = ['th','st','nd','rd'], v = n % 100;
+  return n + (s[(v-20)%10] || s[v] || s[0]);
+}
+
+function myPool(){
+  return S.factList.filter(f =>
+    f.live &&
+    (RULES.ALLOW_OWN_FACTS || f.owner !== MY_ID) &&
+    (RULES.RETRY_SAME_FACT || !f.tried.includes(MY_ID))
+  );
+}
+function myTries(fact){
+  return (fact.state && fact.state[MY_ID]) ? fact.state[MY_ID].tries : 0;
+}
+
+/* What am I playing for RIGHT NOW on this fact? */
+function liveStake(fact){
+  const t = myTries(fact);
+  const row = RULES.PAYOUT['try' + (t+1)];
+  return row ? row.guesser : RULES.PAYOUT.fail.guesser;
+}
+
+const fmt = n => n > 0 ? `gained ${n}` : n < 0 ? `lost ${Math.abs(n)}` : 'broke even';
+const sign = n => n > 0 ? '+'+n : String(n);
+
+
+/* ==================================================================
+   ============  7. NAVIGATION  =====================================
+   ================================================================== */
+
+function openMenu(){ document.getElementById('menu').classList.add('open'); }
+function closeMenu(){ document.getElementById('menu').classList.remove('open'); }
+function go(v){ view = v; closeMenu(); render(); window.scrollTo(0,0); }
+function toGate(g){ gate = g; render(); window.scrollTo(0,0); }
+
+
+/* ==================================================================
+   ============  8. RENDER  =========================================
+   ================================================================== */
+
+function render(){
+  if(!booted) return;
+  S = replay();
+
+  const app   = document.getElementById('app');
+  const bar   = document.getElementById('bar');
+  const strip = document.getElementById('strip');
+
+  if(MY_ID && !S.players[MY_ID]) MY_ID = null;
+
+  const inGame = MY_ID && S.players[MY_ID];
+  bar.classList.toggle('hidden', !inGame);
+  strip.classList.toggle('hidden', !inGame);
+
+  if(inGame){
+    const el = document.getElementById('s-me');
+    const pts = me().pts;
+    el.textContent = pts;
+    if(lastPts !== null && lastPts !== pts){
+      el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
+    }
+    lastPts = pts;
+    document.getElementById('s-rank').textContent = myRank();
+  }
+
+  if(!inGame){ app.innerHTML = gateScreen(); afterRender(); return; }
+  if(gameOver()){ app.innerHTML = overScreen(); return; }
+
+  if(view === 'guess')  app.innerHTML = guessScreen();
+  if(view === 'submit') app.innerHTML = submitScreen();
+  if(view === 'board')  app.innerHTML = boardScreen();
+  if(view === 'rules')  app.innerHTML = rulesScreen(true);
+  afterRender();
+}
+
+function afterRender(){
+  if(document.getElementById('pick-slot')) renderPicker('pick-slot', 'guess');
+  if(document.getElementById('login-slot')) renderPicker('login-slot', 'login');
+  wirePins();
+}
+
+/* CHANGE 8: pin inputs are numeric and capped at PIN_LENGTH */
+function wirePins(){
+  document.querySelectorAll('input.pin').forEach(el => {
+    el.addEventListener('input', () => {
+      el.value = el.value.replace(/\D/g,'').slice(0, RULES.PIN_LENGTH);
+    });
+  });
+}
+
+
+/* ==================================================================
+   ============  9. GATE: sign up or log back in  ===================
+   ================================================================== */
+
+function gateScreen(){
+  if(gate === 'home'){
+    return `
+      <div class="gate">
+        <div class="brand-big">Chisme</div>
+        <div style="margin-top:34px">
+          <button class="act" onclick="toGate('signup')">Sign up</button>
+          <button class="act ghost" style="margin-top:10px" onclick="toGate('login')">I'm already playing</button>
+        </div>
+      </div>
+    `;
+  }
+
+  /* CHANGE 1: log back in by picking your name from a list */
+  if(gate === 'login'){
+    if(!PLAYERS.length){
+      return `
+        <button class="back" onclick="toGate('home')">&larr; Back</button>
+        <h2 class="screen-title">Nobody's playing yet</h2>
+        <p class="copy">You'd be the first. Sign up instead.</p>
+        <button class="act" onclick="toGate('signup')">Sign up</button>
+      `;
+    }
+    return `
+      <button class="back" onclick="toGate('home')">&larr; Back</button>
+      <h2 class="screen-title">Welcome back</h2>
+      <p class="copy">Find your name, then your PIN.</p>
+      <div id="gate-msg"></div>
+      <div class="field">
+        <label class="lbl">Your name</label>
+        <div class="picker"><div id="login-slot"></div></div>
+      </div>
+      <div class="field">
+        <label class="lbl" for="l-pin">PIN</label>
+        <input type="tel" class="pin" id="l-pin" placeholder="&middot;&middot;&middot;&middot;" inputmode="numeric" autocomplete="off" maxlength="${RULES.PIN_LENGTH}">
+      </div>
+      <button class="act" id="l-btn" onclick="doLogin()">Log in</button>
+    `;
+  }
+
+  if(gate === 'signup'){
+    return `
+      <button class="back" onclick="toGate('home')">&larr; Back</button>
+      <h2 class="screen-title">Who are you?</h2>
+      <div id="gate-msg"></div>
+      <div class="field">
+        <label class="lbl" for="s-name">Your name</label>
+        <input type="text" id="s-name" value="${esc(draft.name)}" placeholder="Miguel" autocomplete="off">
+      </div>
+      <div class="field">
+        <label class="lbl" for="s-pin">Pick a ${RULES.PIN_LENGTH} digit PIN</label>
+        <input type="tel" class="pin" id="s-pin" placeholder="&middot;&middot;&middot;&middot;" inputmode="numeric" autocomplete="off" maxlength="${RULES.PIN_LENGTH}">
+        <p class="note">This phone remembers you automatically. The PIN is only for getting back in from somewhere else.</p>
+      </div>
+      <button class="act" onclick="doSignupStep1()">Continue</button>
+      <div class="step-dots"><i class="on"></i><i></i></div>
+    `;
+  }
+
+  /* CHANGE 9: signup chismes come with prompts */
+  const n = RULES.JOIN_CHISMES;
+  let fields = '';
+  for(let i=0;i<n;i++){
+    const prompt = RULES.JOIN_PROMPTS[i] || 'Something true about you';
+    fields += `
+      <div class="field">
+        <label class="lbl" for="c${i}">${esc(prompt)}</label>
+        <textarea id="c${i}" placeholder="">${esc(draft.chismes[i]||'')}</textarea>
+      </div>`;
+  }
+  return `
+    <button class="back" onclick="toGate('signup')">&larr; Back</button>
+    <h2 class="screen-title">Your ${n} chismes</h2>
+    <p class="copy">Tell us about yourself. If people guess them you lost points, if don't you get points.</p>
+    <div id="gate-msg"></div>
+    ${fields}
+    <button class="act" id="j-btn" onclick="doSignup()">Join the game</button>
+    <div class="step-dots"><i class="on"></i><i class="on"></i></div>
+  `;
+}
+
+let loginChoice = null;
+
+async function doLogin(){
+  const pin = document.getElementById('l-pin').value.trim();
+  const box = document.getElementById('gate-msg');
+
+  if(!loginChoice){ box.innerHTML = `<div class="msg bad">Pick your name from the list.</div>`; return; }
+  if(!pin){ box.innerHTML = `<div class="msg bad">Your PIN too.</div>`; return; }
+
+  const btn = document.getElementById('l-btn');
+  btn.disabled = true; btn.textContent = 'Checking...';
+
+  await pull();
+
+  const hit = PLAYERS.find(p => p.id === loginChoice);
+
+  if(!hit){
+    btn.disabled = false; btn.textContent = 'Log in';
+    document.getElementById('gate-msg').innerHTML = `<div class="msg bad">That player's gone. Sign up instead?</div>`;
+    return;
+  }
+  if(String(hit.pin) !== String(pin)){
+    btn.disabled = false; btn.textContent = 'Log in';
+    document.getElementById('gate-msg').innerHTML = `<div class="msg bad">Wrong PIN.</div>`;
+    return;
+  }
+
+  MY_ID = hit.id;
+  localStorage.setItem('chisme_my_id', MY_ID);
+  loginChoice = null;
+  view = 'guess';
+  render();
+}
+
+function doSignupStep1(){
+  const name = document.getElementById('s-name').value.trim();
+  const pin  = document.getElementById('s-pin').value.trim();
+  const box  = document.getElementById('gate-msg');
+
+  if(!name){ box.innerHTML = `<div class="msg bad">Your name first.</div>`; return; }
+  if(pin.length !== RULES.PIN_LENGTH){
+    box.innerHTML = `<div class="msg bad">PIN must be ${RULES.PIN_LENGTH} digits.</div>`; return;
+  }
+  if(PLAYERS.find(p => norm(p.name) === norm(name))){
+    box.innerHTML = `<div class="msg bad">That name's taken. Pick another, or log in if it's you.</div>`;
+    return;
+  }
+
+  draft.name = name;
+  draft.pin  = pin;
+  gate = 'chismes';
+  render();
+}
+
+async function doSignup(){
+  const n = RULES.JOIN_CHISMES;
+  const vals = [];
+  for(let i=0;i<n;i++) vals.push(document.getElementById('c'+i).value.trim());
+
+  if(vals.some(v => !v)){
+    draft.chismes = vals;
+    document.getElementById('gate-msg').innerHTML =
+      `<div class="msg bad">All ${n}, or it's not a game.</div>`;
+    return;
+  }
+
+  const btn = document.getElementById('j-btn');
+  btn.disabled = true; btn.textContent = 'Joining...';
+
+  const id = deviceId();
+  const r  = await pushPlayer(id, draft.name, draft.pin);
+
+  if(!r.ok){
+    btn.disabled = false; btn.textContent = 'Join the game';
+    document.getElementById('gate-msg').innerHTML = r.error === 'name_taken'
+      ? `<div class="msg bad">Someone just took that name. Go back and pick another.</div>`
+      : `<div class="msg bad">Couldn't reach the Sheet. Try again.</div>`;
+    return;
+  }
+
+  await pushEvents(vals.map(v =>
+    mkEvent('fact', id, '', { id: uid(), text: v, free: RULES.JOIN_CHISMES_FREE })
+  ));
+
+  PLAYERS.push({ id, name: draft.name, pin: draft.pin, joined: Date.now() });
+
+  MY_ID = id;
+  localStorage.setItem('chisme_my_id', MY_ID);
+  draft = { name:'', pin:'', chismes:[] };
+  gate = 'home';
+  view = 'guess';
+  render();
+}
+
+
+/* ==================================================================
+   ============  10. THE NAME PICKER  ===============================
+   ============  CHANGE 1 + 5: type to narrow, tap to pick  =========
+   ==================================================================
+
+   Used in two places: guessing, and logging back in. Same component,
+   different candidate list. You can't submit a name that isn't on the
+   list, so exact spelling never matters.                              */
+
+let pickChoice = null;
+
+function candidates(mode){
+  if(mode === 'login'){
+    return [...PLAYERS].sort((a,b)=>a.name.localeCompare(b.name));
+  }
+  return S.playerList
+    .filter(p => RULES.ALLOW_OWN_FACTS || p.id !== MY_ID)
+    .sort((a,b)=>a.name.localeCompare(b.name));
+}
+
+function renderPicker(slotId, mode){
+  const slot = document.getElementById(slotId);
+  if(!slot) return;
+
+  const chosen = (mode === 'login') ? loginChoice : pickChoice;
+
+  if(chosen){
+    const all = candidates(mode);
+    const p = all.find(x => x.id === chosen);
+    slot.innerHTML = `
+      <div class="chosen">
+        <b>${esc(p ? p.name : '?')}</b>
+        <button onclick="clearPick('${slotId}','${mode}')" aria-label="Change">&times;</button>
+      </div>`;
+    return;
+  }
+
+  const box = slot.querySelector('input');
+  const q   = box ? box.value : '';
+  const hadFocus = box && document.activeElement === box;
+
+  const all  = candidates(mode);
+  const hits = q ? all.filter(p => norm(p.name).includes(norm(q))) : all;
+
+  slot.innerHTML = `
+    <input type="text" placeholder="Type a name" autocomplete="off" value="${esc(q)}">
+    <div class="picker-list">
+      ${hits.length
+        ? hits.map(p => `<button type="button" onclick="choose('${p.id}','${slotId}','${mode}')">${esc(p.name)}</button>`).join('')
+        : `<div class="none">No one by that name.</div>`}
+    </div>
+  `;
+
+  const nb = slot.querySelector('input');
+  nb.addEventListener('input', () => renderPicker(slotId, mode));
+  if(hadFocus){
+    nb.focus();
+    nb.setSelectionRange(q.length, q.length);
+  }
+}
+
+function choose(id, slotId, mode){
+  if(mode === 'login') loginChoice = id; else pickChoice = id;
+  renderPicker(slotId, mode);
+}
+function clearPick(slotId, mode){
+  if(mode === 'login') loginChoice = null; else pickChoice = null;
+  renderPicker(slotId, mode);
+}
+
+
+/* ==================================================================
+   ============  11. GUESS  =========================================
+   ================================================================== */
+
+function guessScreen(){
+  if(locked()){
+    return `<h2 class="screen-title">You're in the red</h2>
+      <p class="copy">You're at ${me().pts}. Write a chisme to climb back, then come guess.</p>
+      <button class="act" onclick="go('submit')">Write a chisme</button>`;
+  }
+
+  const pool = myPool();
+  if(!pool.length){
+    return `<h2 class="screen-title">Nothing to guess</h2>
+      <p class="copy">You've tried everything out there. Add a chisme, or wait for someone else to.</p>
+      <button class="act" onclick="go('submit')">Write a chisme</button>`;
+  }
+
+  if(!current || !S.facts[current.id] || !S.facts[current.id].live || !pool.find(f=>f.id===current.id)){
+    current = pool[Math.floor(Math.random()*pool.length)];
+    pickChoice = null;
+  } else {
+    current = S.facts[current.id];
+  }
+
+  const t     = myTries(current);
+  const stake = liveStake(current);
+  const skipCost = RULES.PAYOUT.skip.guesser;
+
+  return `
+    <h2 class="screen-title guess-title">Who wrote this?</h2>
+    <div id="g-msg"></div>
+    <div class="card">
+      <div class="chisme guess-fact">${esc(current.text)}</div>
+
+      <!-- CHANGE 4: one live number, ticks down on each miss -->
+      <div class="stake">
+        <span class="amt ${stake<0?'neg':''}" id="stake-amt">${sign(stake)}</span>
+        <span class="cap">if you<br>get it now</span>
+        <div class="tries">
+          ${[0,1,2].map(i=>`<div class="try ${i<t?'used':''}">${i+1}</div>`).join('')}
+        </div>
+      </div>
+
+      <div class="guess-controls">
+        <div class="picker"><div id="pick-slot"></div></div>
+        <div class="guess-actions">
+          <button class="act" id="g-btn" onclick="doGuess()">Guess</button>
+          <button class="act ghost" onclick="doSkip()">Skip (${sign(skipCost)})</button>
+        </div>
+      </div>
+    </div>
+    <p class="note">${RULES.MAX_TRIES - t} ${t ? 'tries left on this one' : 'tries'}. Miss all three and it's ${sign(RULES.PAYOUT.fail.guesser)}.</p>
+  `;
+}
+
+/* CHANGE 6: skip costs points and burns the fact for you */
+async function doSkip(){
+  const btn = document.querySelector('.ghost');
+  if(btn){ btn.disabled = true; btn.textContent = 'Skipping...'; }
+
+  const fact = current;
+  await pushEvents([ mkEvent('skip', MY_ID, fact.owner, { factId: fact.id }) ]);
+
+  current = null;
+  pickChoice = null;
+  render();
+
+  const p = RULES.PAYOUT.skip;
+  document.getElementById('g-msg').innerHTML =
+    `<div class="msg bad">Skipped. You ${fmt(p.guesser)}.</div>`;
+}
+
+async function doGuess(){
+  const box = document.getElementById('g-msg');
+  if(!pickChoice){
+    box.innerHTML = `<div class="msg bad">Pick a name from the list first.</div>`;
+    return;
+  }
+
+  const btn = document.getElementById('g-btn');
+  btn.disabled = true; btn.textContent = 'Sending...';
+
+  const fact = current;
+  const hit  = (pickChoice === fact.owner);
+  const n    = myTries(fact) + 1;
+
+  await pushEvents([ mkEvent('guess', MY_ID, fact.owner, { factId: fact.id, try: n, hit }) ]);
+
+  pickChoice = null;
+
+  if(hit){
+    const p = RULES.PAYOUT['try'+n];
+    const ord = {1:'first',2:'second',3:'third'}[n];
+    current = null;
+    render();
+    document.getElementById('g-msg').innerHTML =
+      `<div class="msg">${esc(nameOf(fact.owner))}, on the ${ord} try. You ${fmt(p.guesser)}, they ${fmt(p.writer)}.</div>`;
+    return;
+  }
+
+  if(n >= RULES.MAX_TRIES){
+    const p = RULES.PAYOUT.fail;
+    current = null;
+    render();
+    document.getElementById('g-msg').innerHTML =
+      `<div class="msg bad">Three misses. You ${fmt(p.guesser)}, they ${fmt(p.writer)}. The house took ${p.house}.</div>`;
+    return;
+  }
+
+  // still alive: re-render, then animate the stake dropping
+  render();
+  const amt = document.getElementById('stake-amt');
+  if(amt){
+    amt.classList.remove('drop'); void amt.offsetWidth; amt.classList.add('drop');
+  }
+  const left = RULES.MAX_TRIES - n;
+  document.getElementById('g-msg').innerHTML =
+    `<div class="msg bad">Not them. ${left} ${left===1?'try':'tries'} left.</div>`;
+}
+
+
+/* ==================================================================
+   ============  12. SUBMIT  ========================================
+   ================================================================== */
+
+function submitScreen(){
+  const w  = RULES.EXTRA_CHISME_WRITER, h = Math.abs(RULES.EXTRA_CHISME_HOUSE);
+  const t3 = RULES.PAYOUT.try3.writer;
+  return `
+    <h2 class="screen-title">Add a chisme</h2>
+    <p class="copy">You get +${w}. The house pays for it, and loses ${h}.</p>
+    <div id="s-msg"></div>
+    <div class="field">
+      <textarea id="new-chisme" placeholder="Something true about you"></textarea>
+    </div>
+    <button class="act" id="s-btn" onclick="doAddFact()">Add it</button>
+    <p class="note">Aim for hard, not impossible. Guessed on the third try pays you ${sign(t3)}. One nobody ever cracks costs you ${Math.abs(RULES.PAYOUT.fail.writer)}.</p>
+  `;
+}
+
+async function doAddFact(){
+  const t   = document.getElementById('new-chisme').value.trim();
+  const box = document.getElementById('s-msg');
+  if(!t){ box.innerHTML = `<div class="msg bad">Write something first.</div>`; return; }
+  if(locked()){ box.innerHTML = `<div class="msg bad">You're below ${RULES.LOCK_BELOW}. Can't write right now.</div>`; return; }
+
+  const btn = document.getElementById('s-btn');
+  btn.disabled = true; btn.textContent = 'Sending...';
+
+  await pushEvents([ mkEvent('fact', MY_ID, '', { id: uid(), text: t, free: false }) ]);
+
+  render();
+  document.getElementById('s-msg').innerHTML =
+    `<div class="msg">In the pool. You +${RULES.EXTRA_CHISME_WRITER}.</div>`;
+}
+
+
+/* ==================================================================
+   ============  13. LEADERBOARD  ===================================
+   ================================================================== */
+
+function boardScreen(){
+  const rows = [...S.playerList].sort((a,b)=>b.pts-a.pts);
+  return `
+    <h2 class="screen-title">Leaderboard</h2>
+    <table>
+      <tr><th>#</th><th>Name</th><th style="text-align:right">Points</th></tr>
+      ${rows.map((p,i)=>`
+        <tr class="${p.id===MY_ID?'you':''}">
+          <td>${i+1}</td><td class="name">${esc(p.name)}</td><td class="pts">${p.pts}</td>
+        </tr>`).join('')}
+    </table>
+    <p class="note">House: ${S.house} left. ${liveFacts().length} chismes still unguessed.</p>
+    <button class="act ghost" style="margin-top:20px" onclick="refresh()">Refresh</button>
+  `;
+}
+
+async function refresh(){ await pull(); render(); }
+
+
+/* ==================================================================
+   ============  14. RULES  =========================================
+   ============  generated from the RULES object, never hardcoded  ==
+   ================================================================== */
+
+function rulesScreen(withTitle){
+  const P = RULES.PAYOUT;
+  const cell = v => v > 0 ? `<span class="pos">+${v}</span>`
+                  : v < 0 ? `<span class="neg">${v}</span>`
+                          : `<span class="zero">0</span>`;
+  const row = (label, r) =>
+    `<tr><td>${label}</td><td>${cell(r.guesser)}</td><td>${cell(r.writer)}</td><td>${cell(r.house)}</td></tr>`;
+
+  return `
+    ${withTitle ? '<h2 class="screen-title">Rules</h2>' : ''}
+
+    <p class="copy">Everyone writes ${RULES.JOIN_CHISMES} true things about themselves. You read one, you guess who wrote it. The house pays for everything and dies doing it.</p>
+
+    <span class="lbl" style="margin-top:26px">Signing up</span>
+    <p class="note">
+      You start at ${RULES.START_POINTS} points. Your first ${RULES.JOIN_CHISMES} chismes are free.
+      Every player who joins puts ${RULES.HOUSE_PER_PLAYER} into the house, so a bigger group means a longer game.
+    </p>
+
+    <span class="lbl" style="margin-top:22px">Every guess, ${RULES.MAX_TRIES} tries</span>
+    <table class="rules-t">
+      <tr><th></th><th>Guesser</th><th>Writer</th><th>House</th></tr>
+      ${row('1st try',  P.try1)}
+      ${row('2nd try',  P.try2)}
+      ${row('3rd try',  P.try3)}
+      ${row('3 misses', P.fail)}
+      ${row('Skip',     P.skip)}
+    </table>
+    <p class="note">
+      Read the writer's column. Guessed instantly, you lose ${Math.abs(P.try1.writer)}. Never guessed, you lose ${Math.abs(P.fail.writer)}.
+      The money is at ${sign(P.try3.writer)} on the third try. So write something hard, not impossible.
+    </p>
+
+    <span class="lbl" style="margin-top:22px">Adding more chismes</span>
+    <p class="note">Anytime, as many as you like: you ${sign(RULES.EXTRA_CHISME_WRITER)}, house ${RULES.EXTRA_CHISME_HOUSE}.</p>
+
+    <span class="lbl" style="margin-top:22px">The rest</span>
+    <p class="note">
+      You can't guess your own chismes, and once you've missed three times on one, it's done for you.<br>
+      Below ${RULES.LOCK_BELOW} points, you can't guess until you write your way back up.<br>
+      When the house hits 0, it breaks. Highest score wins.
+    </p>
+  `;
+}
+
+
+/* ==================================================================
+   ============  15. GAME OVER  =====================================
+   ================================================================== */
+
+function overScreen(){
+  const rows = [...S.playerList].sort((a,b)=>b.pts-a.pts);
+  const w = rows[0];
+  return `
+    <h2 class="screen-title">The house broke</h2>
+    <p class="copy">${esc(w.name)} wins with ${w.pts}.</p>
+    <table>
+      ${rows.map((p,i)=>`
+        <tr class="${p.id===MY_ID?'you':''}">
+          <td>${i+1}</td><td class="name">${esc(p.name)}</td><td class="pts">${p.pts}</td>
+        </tr>`).join('')}
+    </table>
+  `;
+}
+
+
+/* ==================================================================
+   ============  16. BOOT + POLLING  ================================
+   ================================================================== */
+
+async function boot(){
+  if(API_URL.indexOf('PASTE_YOUR') === 0){
+    booted = true;
+    document.getElementById('app').innerHTML =
+      `<h2 class="screen-title">Not connected</h2>
+       <p class="copy">Open this file and paste your Apps Script URL into API_URL, near the top of the script.</p>`;
+    return;
+  }
+
+  const ok = await pull();
+
+  if(!ok){
+    document.getElementById('app').innerHTML =
+      `<h2 class="screen-title">Can't reach the Sheet</h2>
+       <p class="copy">Check the Apps Script is deployed with access set to "Anyone".</p>
+       <button class="act" onclick="boot()">Try again</button>`;
+    return;
+  }
+
+  booted = true;
+
+  // this device already signed up? straight in, no typing.
+  if(!MY_ID){
+    const mine = PLAYERS.find(p => p.id === deviceId());
+    if(mine){
+      MY_ID = mine.id;
+      localStorage.setItem('chisme_my_id', MY_ID);
+    }
+  }
+
+  render();
+
+  setInterval(async () => {
+    if(document.hidden) return;
+    if(syncing) return;
+    syncing = true;
+    await pull();
+    const typing = (view === 'submit') || (!MY_ID && gate !== 'home');
+    if(!typing) render();
+    syncing = false;
+  }, POLL_MS);
+}
+
+boot();
+</script>
+</body>
+</html>
