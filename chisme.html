@@ -52,6 +52,7 @@
     display:block;font-family:"Caveat",cursive;font-size:30px;letter-spacing:0;
     text-transform:none;line-height:1;margin-top:2px;color:var(--yellow);
   }
+  .strip .n.first-place{color:var(--blue)}
   .strip .n.bump{animation:bump .4s ease}
   @keyframes bump{
     0%{transform:scale(1)}
@@ -64,6 +65,31 @@
   }
   .sync.on{opacity:1}
   .sync.err{background:var(--pink);opacity:1}
+
+  .points-fx{
+    position:fixed;left:0;top:0;transform:translate(0,0);
+    font-family:"Caveat",cursive;font-weight:700;
+    font-size:clamp(84px,24vw,180px);
+    line-height:1;color:var(--pink);
+    text-shadow:0 6px 0 rgba(158,35,23,.55);
+    pointer-events:none;z-index:80;
+    opacity:0;
+  }
+  .points-fx.on{animation:pointsDrop .95s cubic-bezier(.2,.8,.2,1) forwards}
+  @keyframes pointsDrop{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(.65)}
+    20%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}
+    70%{opacity:1;transform:translate(-50%,-140%) scale(.75)}
+    100%{opacity:0;transform:translate(-50%,-175%) scale(.55)}
+  }
+  .points-fly{
+    position:fixed;left:0;top:0;transform:translate(0,0);
+    font-family:"Caveat",cursive;font-weight:700;
+    font-size:clamp(64px,16vw,120px);
+    line-height:1;color:var(--yellow);
+    text-shadow:0 6px 0 rgba(158,35,23,.55);
+    pointer-events:none;z-index:81;opacity:0;
+  }
 
   .menu{
     position:fixed;inset:0;background:var(--red);z-index:55;
@@ -97,6 +123,31 @@
   .copy{
     font-family:"Caveat",cursive;font-weight:600;color:var(--blue);
     font-size:clamp(24px,5.5vw,34px);line-height:1.25;max-width:34ch;margin:16px 0;
+  }
+  .signup-copy{
+    font-family:"Archivo","Helvetica Neue",Arial,sans-serif;
+    color:var(--yellow);
+    font-size:17px;
+    line-height:1.5;
+    max-width:none;
+    margin:16px 0;
+  }
+  .submit-copy{
+    font-family:"Archivo","Helvetica Neue",Arial,sans-serif;
+    color:var(--blue);
+    font-size:17px;
+    line-height:1.4;
+    max-width:34ch;
+    margin:16px 0;
+  }
+  .rules-copy{
+    font-family:"Archivo","Helvetica Neue",Arial,sans-serif;
+    font-size:17px;
+    line-height:1.5;
+    color:var(--yellow);
+    max-width:none;
+    margin:16px 0;
+    opacity:.85;
   }
   .note{font-size:14px;opacity:.75;margin-top:6px;line-height:1.4}
 
@@ -133,6 +184,7 @@
   .card .chisme{
     font-family:"Caveat",cursive;font-weight:600;color:var(--blue);
     font-size:clamp(26px,6vw,36px);line-height:1.2;margin-bottom:18px;
+    text-shadow:1px 1px 0 rgba(224,96,142,.7);
   }
   .card .chisme.guess-fact{
     font-size:clamp(34px,8vw,50px);
@@ -158,7 +210,9 @@
   .stake .cap{
     font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:700;opacity:.75;
   }
-  .tries{display:flex;gap:6px;margin-left:auto}
+  .tries{display:flex;gap:6px}
+  .stake-score{margin-left:auto;text-align:right}
+  .stake-score .cap{display:block}
   .try{
     width:22px;height:22px;border:1px solid rgba(244,196,48,.4);
     display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;
@@ -212,6 +266,8 @@
   td.pts{text-align:right;font-family:"Caveat",cursive;font-size:26px;font-weight:700}
   tr.you td{color:var(--yellow)}
   tr.you td.name::after{content:" (you)";font-size:13px;font-family:"Archivo";opacity:.6}
+  tr.first td.name,
+  tr.first td.pts{color:var(--blue)}
 
   .rules-t{width:100%;border-collapse:collapse;margin:14px 0 6px;font-size:15px}
   .rules-t th{font-size:11px;letter-spacing:1px;padding:8px 3px}
@@ -247,6 +303,7 @@
 </head>
 <body>
 <div class="grain"></div>
+<div id="points-fx" class="points-fx hidden"></div>
 
 <nav class="menu" id="menu">
   <button class="close" onclick="closeMenu()">&times;</button>
@@ -254,6 +311,7 @@
   <a onclick="go('submit')">Add chisme</a>
   <a onclick="go('board')">Leaderboard</a>
   <a onclick="go('rules')">Rules</a>
+  <a id="menu-signout" class="hidden" onclick="doSignOut()">Sign out</a>
 </nav>
 
 <div class="wrap">
@@ -282,6 +340,7 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbxyWokyjwUmmohRKk5ZxXtObaL7nJ2vR33BQmwCZBR2Wcq6dWbBlmc2xon2qyVtrSeA/exec';
 
 const POLL_MS = 5000;    // how often to check the Sheet for other people's moves
+const FETCH_TIMEOUT_MS = 12000;
 
 
 /* ==================================================================
@@ -298,16 +357,10 @@ const POLL_MS = 5000;    // how often to check the Sheet for other people's move
 
 const RULES = {
 
-  /* --- SIGNING UP -----------------------------------------------
-     Each player starts with START_POINTS.
-     Each player joining adds HOUSE_PER_PLAYER to the house.
-     Sign-up chismes are FREE: they cost the house nothing.
-
-     HOUSE_PER_PLAYER=8 gives roughly 5 guesses each for a group that
-     knows each other well, ~17 each for near-strangers. Raise it for
-     a longer game.                                                   */
+    /* --- SIGNING UP -----------------------------------------------
+      Each player starts with START_POINTS.
+      Sign-up facts are FREE.                                         */
   START_POINTS:        5,
-  HOUSE_PER_PLAYER:    8,
   JOIN_CHISMES:        3,
   JOIN_CHISMES_FREE:   true,
 
@@ -315,19 +368,16 @@ const RULES = {
      Add or remove freely: the screen builds itself from this list,
      and JOIN_CHISMES above controls how many boxes appear.           */
   JOIN_PROMPTS: [
-    "Tell us your nickname",
-    "What colour are your shoes right now?",
-    "Any visible tattoo?"
+    "Example: I have a tattoo of a cat on my ankle.",
+    "Example: I am wearing green shoes with yellow laces",
+    "Example: I can touch my nose with the tongue?"
   ],
 
-  /* --- WRITING AN EXTRA CHISME ----------------------------------
-     After signing up, adding a chisme pays you and drains the house.
-     This is the main faucet: the house dies of generosity.           */
+    /* --- WRITING AN EXTRA FACT ------------------------------------ */
   EXTRA_CHISME_WRITER:  +2,
-  EXTRA_CHISME_HOUSE:   -2,
 
   /* --- GUESSING -------------------------------------------------
-     3 tries per fact. Every row sums to ZERO (conserved economy).
+      3 tries per fact.
 
      Design logic, so you know what you'd break by editing:
 
@@ -341,19 +391,15 @@ const RULES = {
         unguessable one also loses you money. Only the sweet spot pays.
         This is the whole reason the game works.
 
-      - House pays for every crack, rakes every total failure.         */
+                                                                     */
   PAYOUT: {
-    try1:  { guesser: +3, writer: -2, house: -1 },
-    try2:  { guesser: +2, writer:  0, house: -2 },
-    try3:  { guesser: +1, writer: +2, house: -3 },
-    fail:  { guesser: -1, writer: -1, house: +2 },
+    try1:  { guesser: +3, writer: -2 },
+    try2:  { guesser: +2, writer:  0 },
+    try3:  { guesser: +1, writer: +2 },
+    fail:  { guesser: -1, writer: -1 },
 
-    /* CHANGE 6: skip costs the same as three misses.
-       Heads up: this makes skipping strictly worse than guessing,
-       since 3 tries cost the same as walking away. Nobody rational
-       will tap it. If it turns out dead at the picnic, set
-       guesser: 0 here and it becomes free again. Row must sum to 0. */
-    skip:  { guesser: -1, writer: -1, house: +2 }
+    /* CHANGE 6: skip costs the same as three misses. */
+    skip:  { guesser: -1, writer: -1 }
   },
 
   /* --- LIMITS ---------------------------------------------------  */
@@ -381,6 +427,8 @@ const RULES = {
    It is not security. It stops accidents, not attackers.             */
 
 const DEVICE_KEY = 'chisme_device_id';
+const LOCAL_BURN_KEY = 'chisme_local_burned_facts';
+const LOCAL_CURRENT_KEY = 'chisme_local_current_fact';
 
 function deviceId(){
   let id = localStorage.getItem(DEVICE_KEY);
@@ -392,6 +440,60 @@ function deviceId(){
 }
 
 let MY_ID = localStorage.getItem('chisme_my_id') || null;
+let LOCAL_BURNED = new Set();
+let LOCAL_BURNED_FOR = null;
+
+function loadLocalBurned(){
+  if(!MY_ID){
+    LOCAL_BURNED = new Set();
+    LOCAL_BURNED_FOR = null;
+    return;
+  }
+  if(LOCAL_BURNED_FOR === MY_ID) return;
+
+  let map = {};
+  try{ map = JSON.parse(localStorage.getItem(LOCAL_BURN_KEY) || '{}'); }
+  catch(_e){ map = {}; }
+
+  LOCAL_BURNED = new Set(Array.isArray(map[MY_ID]) ? map[MY_ID] : []);
+  LOCAL_BURNED_FOR = MY_ID;
+}
+
+function addLocalBurn(factId){
+  if(!MY_ID || !factId) return;
+  loadLocalBurned();
+  if(LOCAL_BURNED.has(factId)) return;
+
+  LOCAL_BURNED.add(factId);
+
+  let map = {};
+  try{ map = JSON.parse(localStorage.getItem(LOCAL_BURN_KEY) || '{}'); }
+  catch(_e){ map = {}; }
+  const arr = Array.isArray(map[MY_ID]) ? map[MY_ID] : [];
+  if(!arr.includes(factId)) arr.push(factId);
+  map[MY_ID] = arr;
+  localStorage.setItem(LOCAL_BURN_KEY, JSON.stringify(map));
+}
+
+function readLocalCurrentFact(){
+  if(!MY_ID) return null;
+  let map = {};
+  try{ map = JSON.parse(localStorage.getItem(LOCAL_CURRENT_KEY) || '{}'); }
+  catch(_e){ map = {}; }
+  return map[MY_ID] || null;
+}
+
+function writeLocalCurrentFact(factId){
+  if(!MY_ID) return;
+  let map = {};
+  try{ map = JSON.parse(localStorage.getItem(LOCAL_CURRENT_KEY) || '{}'); }
+  catch(_e){ map = {}; }
+
+  if(factId) map[MY_ID] = factId;
+  else delete map[MY_ID];
+
+  localStorage.setItem(LOCAL_CURRENT_KEY, JSON.stringify(map));
+}
 
 
 /* ==================================================================
@@ -409,6 +511,40 @@ let MY_ID = localStorage.getItem('chisme_my_id') || null;
 let PLAYERS = [];
 let EVENTS  = [];
 let syncing = false;
+const PENDING_EVENTS = new Map();
+
+async function fetchWithTimeout(url, options){
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try{
+    return await fetch(url, { ...(options || {}), signal:controller.signal });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+function eventKey(ev){
+  const p = ev.payload || {};
+  return [
+    ev.ts || 0,
+    ev.type || '',
+    ev.actor || '',
+    ev.target || '',
+    p.factId || '',
+    p.id || '',
+    p.try || '',
+    p.hit ? 1 : 0,
+    p.free ? 1 : 0,
+    p.text || ''
+  ].join('|');
+}
+
+function mergeEvents(remoteEvents){
+  const all = [...(remoteEvents || []), ...PENDING_EVENTS.values()];
+  const dedup = new Map();
+  for(const ev of all) dedup.set(eventKey(ev), ev);
+  return Array.from(dedup.values());
+}
 
 function flash(state){
   const el = document.getElementById('sync');
@@ -419,11 +555,11 @@ function flash(state){
 
 async function pull(){
   try{
-    const res  = await fetch(API_URL, { method:'GET' });
+    const res  = await fetchWithTimeout(API_URL, { method:'GET' });
     const data = await res.json();
     if(data.ok){
       PLAYERS = data.players || [];
-      EVENTS  = data.events  || [];
+      EVENTS  = mergeEvents(data.events || []);
       flash('on');
       return true;
     }
@@ -434,7 +570,7 @@ async function pull(){
 }
 
 async function postJSON(body){
-  const res = await fetch(API_URL, {
+  const res = await fetchWithTimeout(API_URL, {
     method:'POST',
     headers:{ 'Content-Type':'text/plain;charset=utf-8' },
     body: JSON.stringify(body)
@@ -455,9 +591,13 @@ async function pushPlayer(id, name, pin){
 
 /* Pass an array to send them all in ONE round trip. */
 async function pushEvents(list){
-  list.forEach(e => EVENTS.push(e));           // optimistic: show it now
+  list.forEach(e => {
+    PENDING_EVENTS.set(eventKey(e), e);
+    EVENTS.push(e);                            // optimistic: show it now
+  });
   try{
     await postJSON(list.length === 1 ? list[0] : { events:list });
+    list.forEach(e => PENDING_EVENTS.delete(eventKey(e)));
     flash('on');
   }catch(e){
     flash('err');
@@ -477,7 +617,7 @@ const mkEvent = (type, actor, target, payload) =>
    matter and a hand-edited row can't silently drop a fact.            */
 
 function replay(){
-  const S = { players:{}, facts:{}, house:0 };
+  const S = { players:{}, facts:{} };
 
   for(const p of PLAYERS){
     if(S.players[p.id]) continue;
@@ -485,7 +625,6 @@ function replay(){
       id:p.id, name:p.name, pin:String(p.pin),
       pts: RULES.START_POINTS
     };
-    S.house += RULES.HOUSE_PER_PLAYER;
   }
 
   const log = [...EVENTS].sort((a,b) => (a.ts||0) - (b.ts||0));
@@ -500,7 +639,6 @@ function replay(){
       S.facts[p.id] = { id:p.id, owner:ev.actor, text:p.text, live:true, tried:[], state:{} };
       if(!p.free){
         owner.pts += RULES.EXTRA_CHISME_WRITER;
-        S.house   += RULES.EXTRA_CHISME_HOUSE;
       }
     }
 
@@ -515,7 +653,6 @@ function replay(){
       const row = RULES.PAYOUT.skip;
       skipper.pts += row.guesser;
       writer.pts  += row.writer;
-      S.house     += row.house;
       f.tried.push(ev.actor);                   // burned for them, live for everyone else
     }
 
@@ -536,14 +673,12 @@ function replay(){
         if(!row) continue;
         guesser.pts += row.guesser;
         writer.pts  += row.writer;
-        S.house     += row.house;
         f.live = false;
         f.crackedBy = ev.actor;
       } else if(n >= RULES.MAX_TRIES){
         const row = RULES.PAYOUT.fail;
         guesser.pts += row.guesser;
         writer.pts  += row.writer;
-        S.house     += row.house;
         f.tried.push(ev.actor);
       }
     }
@@ -559,13 +694,14 @@ function replay(){
    ============  6. GAME STATE + HELPERS  ===========================
    ================================================================== */
 
-let S    = { players:{}, facts:{}, factList:[], playerList:[], house:0 };
+let S    = { players:{}, facts:{}, factList:[], playerList:[] };
 let view = 'guess';
 let gate = 'home';                 // home | signup | chismes | login
 let draft = { name:'', pin:'', chismes:[] };
 let current = null;
 let booted  = false;
 let lastPts = null;                // for the score bump animation
+let renderHoldUntil = 0;           // pauses auto-render while point-loss animation plays
 
 const norm = s => String(s||'').trim().toLowerCase()
   .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
@@ -578,7 +714,6 @@ function me(){ return S.players[MY_ID]; }
 function nameOf(id){ return S.players[id] ? S.players[id].name : '?'; }
 function liveFacts(){ return S.factList.filter(f => f.live); }
 function locked(){ return me() && me().pts < RULES.LOCK_BELOW; }
-function gameOver(){ return S.playerList.length > 0 && S.house <= 0; }
 
 function myRank(){
   const sorted = [...S.playerList].sort((a,b)=>b.pts-a.pts);
@@ -591,10 +726,12 @@ function ordinal(n){
 }
 
 function myPool(){
+  loadLocalBurned();
   return S.factList.filter(f =>
     f.live &&
     (RULES.ALLOW_OWN_FACTS || f.owner !== MY_ID) &&
-    (RULES.RETRY_SAME_FACT || !f.tried.includes(MY_ID))
+    (RULES.RETRY_SAME_FACT || !f.tried.includes(MY_ID)) &&
+    !LOCAL_BURNED.has(f.id)
   );
 }
 function myTries(fact){
@@ -621,6 +758,78 @@ function closeMenu(){ document.getElementById('menu').classList.remove('open'); 
 function go(v){ view = v; closeMenu(); render(); window.scrollTo(0,0); }
 function toGate(g){ gate = g; render(); window.scrollTo(0,0); }
 
+function showPointsFx(delta, onDone){
+  const el = document.getElementById('points-fx');
+  const toEl = document.getElementById('s-me');
+  if(!el || !toEl){ if(onDone) onDone(); return; }
+
+  const to = toEl.getBoundingClientRect();
+  const sx = window.innerWidth / 2;
+  const sy = window.innerHeight * 0.44;
+  const tx = to.left + to.width / 2;
+  const ty = to.top + to.height / 2;
+
+  el.textContent = delta > 0 ? `+${delta}` : String(delta);
+  el.classList.remove('hidden','on');
+
+  const start = `translate(${sx}px, ${sy}px) translate(-50%, -50%) scale(.65)`;
+  const pop = `translate(${sx}px, ${sy}px) translate(-50%, -50%) scale(1.18)`;
+  const end = `translate(${tx}px, ${ty}px) translate(-50%, -50%) scale(.72)`;
+
+  const anim = el.animate(
+    [
+      { transform:start, opacity:0 },
+      { transform:pop, opacity:1, offset:0.22 },
+      { transform:end, opacity:0, offset:1 }
+    ],
+    { duration:980, easing:'cubic-bezier(.2,.8,.2,1)', fill:'forwards' }
+  );
+
+  anim.onfinish = () => {
+    el.classList.add('hidden');
+    if(onDone) onDone();
+  };
+}
+
+function animatePointsToTop(delta, fromId, onDone){
+  const fromEl = document.getElementById(fromId);
+  const toEl = document.getElementById('s-me');
+  if(!fromEl || !toEl){
+    showPointsFx(delta, onDone);
+    return;
+  }
+
+  const from = fromEl.getBoundingClientRect();
+  const to = toEl.getBoundingClientRect();
+  const sx = from.left + from.width / 2;
+  const sy = from.top + from.height / 2;
+  const tx = to.left + to.width / 2;
+  const ty = to.top + to.height / 2;
+
+  const fly = document.createElement('div');
+  fly.className = 'points-fly';
+  fly.textContent = delta > 0 ? `+${delta}` : String(delta);
+  document.body.appendChild(fly);
+
+  const start = `translate(${sx}px, ${sy}px) translate(-50%, -50%) scale(1)`;
+  const pop = `translate(${sx}px, ${sy}px) translate(-50%, -50%) scale(2.3)`;
+  const end = `translate(${tx}px, ${ty}px) translate(-50%, -50%) scale(.72)`;
+
+  const anim = fly.animate(
+    [
+      { transform:start, opacity:0 },
+      { transform:pop, opacity:1, offset:0.22 },
+      { transform:end, opacity:0, offset:1 }
+    ],
+    { duration:980, easing:'cubic-bezier(.2,.8,.2,1)', fill:'forwards' }
+  );
+
+  anim.onfinish = () => {
+    fly.remove();
+    if(onDone) onDone();
+  };
+}
+
 
 /* ==================================================================
    ============  8. RENDER  =========================================
@@ -636,9 +845,12 @@ function render(){
 
   if(MY_ID && !S.players[MY_ID]) MY_ID = null;
 
+  loadLocalBurned();
+
   const inGame = MY_ID && S.players[MY_ID];
   bar.classList.toggle('hidden', !inGame);
   strip.classList.toggle('hidden', !inGame);
+  document.getElementById('menu-signout').classList.toggle('hidden', !inGame);
 
   if(inGame){
     const el = document.getElementById('s-me');
@@ -648,12 +860,13 @@ function render(){
       el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
     }
     lastPts = pts;
-    document.getElementById('s-rank').textContent = myRank();
+    const rankEl = document.getElementById('s-rank');
+    const rank = myRank();
+    rankEl.textContent = rank;
+    rankEl.classList.toggle('first-place', rank === '1st');
   }
 
   if(!inGame){ app.innerHTML = gateScreen(); afterRender(); return; }
-  if(gameOver()){ app.innerHTML = overScreen(); return; }
-
   if(view === 'guess')  app.innerHTML = guessScreen();
   if(view === 'submit') app.innerHTML = submitScreen();
   if(view === 'board')  app.innerHTML = boardScreen();
@@ -665,6 +878,30 @@ function afterRender(){
   if(document.getElementById('pick-slot')) renderPicker('pick-slot', 'guess');
   if(document.getElementById('login-slot')) renderPicker('login-slot', 'login');
   wirePins();
+}
+
+function doSignOut(){
+  const oldId = MY_ID;
+  MY_ID = null;
+  localStorage.removeItem('chisme_my_id');
+
+  if(oldId){
+    let map = {};
+    try{ map = JSON.parse(localStorage.getItem(LOCAL_CURRENT_KEY) || '{}'); }
+    catch(_e){ map = {}; }
+    delete map[oldId];
+    localStorage.setItem(LOCAL_CURRENT_KEY, JSON.stringify(map));
+  }
+
+  LOCAL_BURNED = new Set();
+  LOCAL_BURNED_FOR = null;
+  current = null;
+  pickChoice = null;
+  loginChoice = null;
+  view = 'guess';
+  gate = 'home';
+  closeMenu();
+  render();
 }
 
 /* CHANGE 8: pin inputs are numeric and capped at PIN_LENGTH */
@@ -680,6 +917,29 @@ function wirePins(){
 /* ==================================================================
    ============  9. GATE: sign up or log back in  ===================
    ================================================================== */
+
+function payoutTableMarkup(){
+  const P = RULES.PAYOUT;
+  const cell = v => v > 0 ? `<span class="pos">+${v}</span>`
+                  : v < 0 ? `<span class="neg">${v}</span>`
+                          : `<span class="zero">0</span>`;
+  const row = (label, r) =>
+    `<tr><td>${label}</td><td>${cell(r.guesser)}</td><td>${cell(r.writer)}</td></tr>`;
+
+  return `
+    <div style="margin:22px 0 20px">
+    <span class="lbl" style="margin-top:22px">When guessing people will have ${RULES.MAX_TRIES} tries</span>
+    <table class="rules-t">
+      <tr><th></th><th>Guesser</th><th>Writer</th></tr>
+      ${row('1st try',  P.try1)}
+      ${row('2nd try',  P.try2)}
+      ${row('3rd try',  P.try3)}
+      ${row('3 misses', P.fail)}
+      ${row('Skip',     P.skip)}
+    </table>
+    </div>
+  `;
+}
 
 function gateScreen(){
   if(gate === 'home'){
@@ -733,7 +993,6 @@ function gateScreen(){
       <div class="field">
         <label class="lbl" for="s-pin">Pick a ${RULES.PIN_LENGTH} digit PIN</label>
         <input type="tel" class="pin" id="s-pin" placeholder="&middot;&middot;&middot;&middot;" inputmode="numeric" autocomplete="off" maxlength="${RULES.PIN_LENGTH}">
-        <p class="note">This phone remembers you automatically. The PIN is only for getting back in from somewhere else.</p>
       </div>
       <button class="act" onclick="doSignupStep1()">Continue</button>
       <div class="step-dots"><i class="on"></i><i></i></div>
@@ -744,17 +1003,22 @@ function gateScreen(){
   const n = RULES.JOIN_CHISMES;
   let fields = '';
   for(let i=0;i<n;i++){
-    const prompt = RULES.JOIN_PROMPTS[i] || 'Something true about you';
+    const prompt = RULES.JOIN_PROMPTS[i] || 'Tell us something about yourself.';
     fields += `
       <div class="field">
-        <label class="lbl" for="c${i}">${esc(prompt)}</label>
-        <textarea id="c${i}" placeholder="">${esc(draft.chismes[i]||'')}</textarea>
+        <label class="lbl" for="c${i}">Fact ${i+1}</label>
+        <textarea id="c${i}" placeholder="${esc(prompt)}">${esc(draft.chismes[i]||'')}</textarea>
       </div>`;
   }
   return `
     <button class="back" onclick="toGate('signup')">&larr; Back</button>
-    <h2 class="screen-title">Your ${n} chismes</h2>
-    <p class="copy">Tell us about yourself. If people guess them you lost points, if don't you get points.</p>
+    <h2 class="screen-title">Your ${n} facts</h2>
+    <p class="signup-copy">You write 3 facts about yourself. 
+      Each fact after gives you +2 points. 
+      You guess other players' facts. 
+      If you guess right, you gain points and they lose points. If you guess wrong, you lose points and they gain points.
+      </p>
+    ${payoutTableMarkup()}
     <div id="gate-msg"></div>
     ${fields}
     <button class="act" id="j-btn" onclick="doSignup()">Join the game</button>
@@ -940,17 +1204,26 @@ function guessScreen(){
   }
 
   const pool = myPool();
+  const freshPool = pool.filter(f => myTries(f) === 0);
   if(!pool.length){
+    writeLocalCurrentFact(null);
     return `<h2 class="screen-title">Nothing to guess</h2>
       <p class="copy">You've tried everything out there. Add a chisme, or wait for someone else to.</p>
       <button class="act" onclick="go('submit')">Write a chisme</button>`;
   }
 
   if(!current || !S.facts[current.id] || !S.facts[current.id].live || !pool.find(f=>f.id===current.id)){
-    current = pool[Math.floor(Math.random()*pool.length)];
+    const pinnedId = readLocalCurrentFact();
+    current = pinnedId ? pool.find(f => f.id === pinnedId) : null;
+    if(!current){
+      const nextPool = freshPool.length ? freshPool : pool;
+      current = nextPool[Math.floor(Math.random()*nextPool.length)];
+    }
+    writeLocalCurrentFact(current.id);
     pickChoice = null;
   } else {
     current = S.facts[current.id];
+    writeLocalCurrentFact(current.id);
   }
 
   const t     = myTries(current);
@@ -965,10 +1238,12 @@ function guessScreen(){
 
       <!-- CHANGE 4: one live number, ticks down on each miss -->
       <div class="stake">
-        <span class="amt ${stake<0?'neg':''}" id="stake-amt">${sign(stake)}</span>
-        <span class="cap">if you<br>get it now</span>
         <div class="tries">
           ${[0,1,2].map(i=>`<div class="try ${i<t?'used':''}">${i+1}</div>`).join('')}
+        </div>
+        <div class="stake-score">
+          <span class="amt ${stake<0?'neg':''}" id="stake-amt">${sign(stake)}</span>
+          <span class="cap">points</span>
         </div>
       </div>
 
@@ -980,7 +1255,6 @@ function guessScreen(){
         </div>
       </div>
     </div>
-    <p class="note">${RULES.MAX_TRIES - t} ${t ? 'tries left on this one' : 'tries'}. Miss all three and it's ${sign(RULES.PAYOUT.fail.guesser)}.</p>
   `;
 }
 
@@ -990,21 +1264,28 @@ async function doSkip(){
   if(btn){ btn.disabled = true; btn.textContent = 'Skipping...'; }
 
   const fact = current;
-  await pushEvents([ mkEvent('skip', MY_ID, fact.owner, { factId: fact.id }) ]);
+  addLocalBurn(fact.id);
+  writeLocalCurrentFact(null);
+  const p = RULES.PAYOUT.skip;
+  // Optimistic update: apply locally now, sync to Sheet in background.
+  pushEvents([ mkEvent('skip', MY_ID, fact.owner, { factId: fact.id }) ]);
+
+  pickChoice = null;
+
+  renderHoldUntil = Date.now() + 980;
+  showPointsFx(p.guesser, () => {
+    current = null;
+    render();
+  });
 
   current = null;
-  pickChoice = null;
-  render();
-
-  const p = RULES.PAYOUT.skip;
-  document.getElementById('g-msg').innerHTML =
-    `<div class="msg bad">Skipped. You ${fmt(p.guesser)}.</div>`;
+  document.getElementById('g-msg').innerHTML = '';
 }
 
 async function doGuess(){
   const box = document.getElementById('g-msg');
   if(!pickChoice){
-    box.innerHTML = `<div class="msg bad">Pick a name from the list first.</div>`;
+    box.innerHTML = '';
     return;
   }
 
@@ -1015,26 +1296,41 @@ async function doGuess(){
   const hit  = (pickChoice === fact.owner);
   const n    = myTries(fact) + 1;
 
-  await pushEvents([ mkEvent('guess', MY_ID, fact.owner, { factId: fact.id, try: n, hit }) ]);
+  // Optimistic update: apply locally now, sync to Sheet in background.
+  pushEvents([ mkEvent('guess', MY_ID, fact.owner, { factId: fact.id, try: n, hit }) ]);
 
   pickChoice = null;
 
   if(hit){
     const p = RULES.PAYOUT['try'+n];
-    const ord = {1:'first',2:'second',3:'third'}[n];
+    writeLocalCurrentFact(null);
+
+    // Hold updates while the gain flies into the top "Your points" counter.
+    renderHoldUntil = Date.now() + 980;
+    animatePointsToTop(p.guesser, 'stake-amt', () => {
+      current = null;
+      render();
+    });
+
     current = null;
-    render();
-    document.getElementById('g-msg').innerHTML =
-      `<div class="msg">${esc(nameOf(fact.owner))}, on the ${ord} try. You ${fmt(p.guesser)}, they ${fmt(p.writer)}.</div>`;
+    document.getElementById('g-msg').innerHTML = '';
     return;
   }
 
   if(n >= RULES.MAX_TRIES){
+    addLocalBurn(fact.id);
+    writeLocalCurrentFact(null);
     const p = RULES.PAYOUT.fail;
+
+    // Hold screen updates so the loss animation is visible before next question appears.
+    renderHoldUntil = Date.now() + 980;
+    showPointsFx(p.guesser, () => {
+      current = null;
+      render();
+    });
+
     current = null;
-    render();
-    document.getElementById('g-msg').innerHTML =
-      `<div class="msg bad">Three misses. You ${fmt(p.guesser)}, they ${fmt(p.writer)}. The house took ${p.house}.</div>`;
+    if(Date.now() >= renderHoldUntil) render();
     return;
   }
 
@@ -1044,9 +1340,8 @@ async function doGuess(){
   if(amt){
     amt.classList.remove('drop'); void amt.offsetWidth; amt.classList.add('drop');
   }
-  const left = RULES.MAX_TRIES - n;
-  document.getElementById('g-msg').innerHTML =
-    `<div class="msg bad">Not them. ${left} ${left===1?'try':'tries'} left.</div>`;
+  // Keep this empty on regular misses: no pink warning box.
+  document.getElementById('g-msg').innerHTML = '';
 }
 
 
@@ -1055,17 +1350,16 @@ async function doGuess(){
    ================================================================== */
 
 function submitScreen(){
-  const w  = RULES.EXTRA_CHISME_WRITER, h = Math.abs(RULES.EXTRA_CHISME_HOUSE);
-  const t3 = RULES.PAYOUT.try3.writer;
+  const w  = RULES.EXTRA_CHISME_WRITER;
   return `
-    <h2 class="screen-title">Add a chisme</h2>
-    <p class="copy">You get +${w}. The house pays for it, and loses ${h}.</p>
+    <h2 class="screen-title">Add a fact</h2>
+    <p class="submit-copy">You get +${w} per each fact you add.</p>
     <div id="s-msg"></div>
     <div class="field">
-      <textarea id="new-chisme" placeholder="Something true about you"></textarea>
+      <textarea id="new-chisme" placeholder="Tell us a fact. Something visible or that people can ask you about."></textarea>
     </div>
     <button class="act" id="s-btn" onclick="doAddFact()">Add it</button>
-    <p class="note">Aim for hard, not impossible. Guessed on the third try pays you ${sign(t3)}. One nobody ever cracks costs you ${Math.abs(RULES.PAYOUT.fail.writer)}.</p>
+
   `;
 }
 
@@ -1097,11 +1391,11 @@ function boardScreen(){
     <table>
       <tr><th>#</th><th>Name</th><th style="text-align:right">Points</th></tr>
       ${rows.map((p,i)=>`
-        <tr class="${p.id===MY_ID?'you':''}">
+        <tr class="${p.id===MY_ID?'you ':''}${i===0?'first':''}">
           <td>${i+1}</td><td class="name">${esc(p.name)}</td><td class="pts">${p.pts}</td>
         </tr>`).join('')}
     </table>
-    <p class="note">House: ${S.house} left. ${liveFacts().length} chismes still unguessed.</p>
+    <p class="note">${liveFacts().length} facts still unguessed.</p>
     <button class="act ghost" style="margin-top:20px" onclick="refresh()">Refresh</button>
   `;
 }
@@ -1120,22 +1414,21 @@ function rulesScreen(withTitle){
                   : v < 0 ? `<span class="neg">${v}</span>`
                           : `<span class="zero">0</span>`;
   const row = (label, r) =>
-    `<tr><td>${label}</td><td>${cell(r.guesser)}</td><td>${cell(r.writer)}</td><td>${cell(r.house)}</td></tr>`;
+    `<tr><td>${label}</td><td>${cell(r.guesser)}</td><td>${cell(r.writer)}</td></tr>`;
 
   return `
     ${withTitle ? '<h2 class="screen-title">Rules</h2>' : ''}
 
-    <p class="copy">Everyone writes ${RULES.JOIN_CHISMES} true things about themselves. You read one, you guess who wrote it. The house pays for everything and dies doing it.</p>
+    <p class="rules-copy">Everyone writes ${RULES.JOIN_CHISMES} facts about themselves. You read a fact from another player and you guess who wrote it.</p>
 
     <span class="lbl" style="margin-top:26px">Signing up</span>
     <p class="note">
-      You start at ${RULES.START_POINTS} points. Your first ${RULES.JOIN_CHISMES} chismes are free.
-      Every player who joins puts ${RULES.HOUSE_PER_PLAYER} into the house, so a bigger group means a longer game.
-    </p>
+      You write ${RULES.JOIN_CHISMES} facts about yourself. Each extra fact gives you ${sign(RULES.EXTRA_CHISME_WRITER)} points.
+      You guess other players' facts. If you guess right, you gain points and they lose points. If you guess wrong, you lose points and they gain points.
 
     <span class="lbl" style="margin-top:22px">Every guess, ${RULES.MAX_TRIES} tries</span>
     <table class="rules-t">
-      <tr><th></th><th>Guesser</th><th>Writer</th><th>House</th></tr>
+      <tr><th></th><th>Guesser</th><th>Writer</th></tr>
       ${row('1st try',  P.try1)}
       ${row('2nd try',  P.try2)}
       ${row('3rd try',  P.try3)}
@@ -1147,35 +1440,15 @@ function rulesScreen(withTitle){
       The money is at ${sign(P.try3.writer)} on the third try. So write something hard, not impossible.
     </p>
 
-    <span class="lbl" style="margin-top:22px">Adding more chismes</span>
-    <p class="note">Anytime, as many as you like: you ${sign(RULES.EXTRA_CHISME_WRITER)}, house ${RULES.EXTRA_CHISME_HOUSE}.</p>
+    <span class="lbl" style="margin-top:22px">Adding more facts</span>
+    <p class="note">Anytime, as many as you like: you ${sign(RULES.EXTRA_CHISME_WRITER)}.</p>
 
     <span class="lbl" style="margin-top:22px">The rest</span>
     <p class="note">
       You can't guess your own chismes, and once you've missed three times on one, it's done for you.<br>
-      Below ${RULES.LOCK_BELOW} points, you can't guess until you write your way back up.<br>
-      When the house hits 0, it breaks. Highest score wins.
+      Below ${RULES.LOCK_BELOW} points, you can't guess until you write more facts to get points.<br>
+      Highest score wins.
     </p>
-  `;
-}
-
-
-/* ==================================================================
-   ============  15. GAME OVER  =====================================
-   ================================================================== */
-
-function overScreen(){
-  const rows = [...S.playerList].sort((a,b)=>b.pts-a.pts);
-  const w = rows[0];
-  return `
-    <h2 class="screen-title">The house broke</h2>
-    <p class="copy">${esc(w.name)} wins with ${w.pts}.</p>
-    <table>
-      ${rows.map((p,i)=>`
-        <tr class="${p.id===MY_ID?'you':''}">
-          <td>${i+1}</td><td class="name">${esc(p.name)}</td><td class="pts">${p.pts}</td>
-        </tr>`).join('')}
-    </table>
   `;
 }
 
@@ -1222,7 +1495,7 @@ async function boot(){
     syncing = true;
     await pull();
     const typing = (view === 'submit') || (!MY_ID && gate !== 'home');
-    if(!typing) render();
+    if(!typing && Date.now() >= renderHoldUntil) render();
     syncing = false;
   }, POLL_MS);
 }
