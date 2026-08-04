@@ -673,8 +673,8 @@ function replay(){
         if(!row) continue;
         guesser.pts += row.guesser;
         writer.pts  += row.writer;
-        f.live = false;
-        f.crackedBy = ev.actor;
+        // Correct guess: done for this guesser only; others can still get this fact.
+        f.tried.push(ev.actor);
       } else if(n >= RULES.MAX_TRIES){
         const row = RULES.PAYOUT.fail;
         guesser.pts += row.guesser;
@@ -712,7 +712,13 @@ const esc = s => String(s).replace(/[&<>"']/g, c =>
 
 function me(){ return S.players[MY_ID]; }
 function nameOf(id){ return S.players[id] ? S.players[id].name : '?'; }
-function liveFacts(){ return S.factList.filter(f => f.live); }
+function liveFacts(){
+  return S.factList.filter(f => {
+    if(!f.live) return false;
+    const eligible = S.playerList.filter(p => RULES.ALLOW_OWN_FACTS || p.id !== f.owner);
+    return eligible.some(p => !f.tried.includes(p.id));
+  });
+}
 function locked(){ return me() && me().pts < RULES.LOCK_BELOW; }
 
 function myRank(){
@@ -1395,7 +1401,7 @@ function boardScreen(){
           <td>${i+1}</td><td class="name">${esc(p.name)}</td><td class="pts">${p.pts}</td>
         </tr>`).join('')}
     </table>
-    <p class="note">${liveFacts().length} facts still unguessed.</p>
+    <p class="note">${liveFacts().length} facts still in play.</p>
     <button class="act ghost" style="margin-top:20px" onclick="refresh()">Refresh</button>
   `;
 }
@@ -1445,7 +1451,7 @@ function rulesScreen(withTitle){
 
     <span class="lbl" style="margin-top:22px">The rest</span>
     <p class="note">
-      You can't guess your own chismes, and once you've missed three times on one, it's done for you.<br>
+      You can't guess your own chismes, and once you guess one right (or miss it three times), it's done for you.<br>
       Below ${RULES.LOCK_BELOW} points, you can't guess until you write more facts to get points.<br>
       Highest score wins.
     </p>
