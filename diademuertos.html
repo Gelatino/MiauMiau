@@ -36,7 +36,7 @@ body{
 .macario-section,
 .altar-section,
 .badges-section,
-.footer{
+.closing-section{
   scroll-snap-align:start;
   scroll-snap-stop:always;
   min-height:100svh;
@@ -50,38 +50,57 @@ body{
   align-items:center;
   justify-content:center;
   overflow:hidden;
-  background:var(--ink);
-}
-.hero-img{
-  position:absolute;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  opacity:0.5;
-}
-.hero-vignette{
-  position:absolute;
-  inset:0;
-  background:radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.7) 100%);
+  background:#000;
 }
 .candles{
-  position:absolute;
+  position:fixed;
   inset:0;
+  z-index:2;
   pointer-events:none;
+  opacity:1;
+  transition:opacity 2.8s ease-out;
+}
+.candles.is-scrolling{
+  opacity:0.28;
+  transition-duration:0.2s;
 }
 .candle-dot{
   position:absolute;
   width:8px;
   height:8px;
-  background:var(--candle);
+  background:transparent;
   border-radius:50%;
   opacity:0.6;
-  filter:drop-shadow(0 0 6px var(--marigold));
-  animation:flicker 2s infinite;
+  transform-origin:center;
+  animation:flicker var(--flicker-duration,4s) ease-in-out infinite var(--flicker-delay,0s);
+}
+.candle-dot::before{
+  content:"";
+  position:absolute;
+  inset:-22px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,223,160,0.38) 0%,rgba(242,169,0,0.18) 34%,rgba(242,169,0,0) 72%);
+  filter:blur(7px);
+  opacity:0.7;
+  animation:halo-pulse 5.2s ease-in-out infinite var(--flicker-delay,0s);
+}
+.candle-dot::after{
+  content:"";
+  position:absolute;
+  inset:2px;
+  border-radius:50%;
+  background:#fff1c9;
+  box-shadow:0 0 4px 2px rgba(255,223,160,0.55);
+}
+@keyframes halo-pulse{
+  0%,100%{opacity:0.66;transform:scale(0.94);}
+  50%{opacity:0.82;transform:scale(1.06);}
 }
 @keyframes flicker{
-  0%, 100%{opacity:0.4;}
-  50%{opacity:0.9;}
+  0%,100%{opacity:0.72;transform:scale(0.98);}
+  30%{opacity:0.82;transform:scale(1.03);}
+  52%{opacity:0.69;transform:scale(0.97);}
+  76%{opacity:0.8;transform:scale(1.02);}
 }
 .hero-content{
   position:relative;
@@ -98,16 +117,15 @@ body{
   margin-bottom:16px;
 }
 .hero-content h1{
-  font-family:'Playfair Display', serif;
-  font-size:clamp(2.4rem, 8vw, 5.2rem);
+  font-family:'8 Heavy', 'Barlow Condensed', sans-serif;
+  font-size:clamp(4.4rem, 8vw, 6.2rem);
   line-height:1.2;
   margin-bottom:18px;
   font-weight:700;
-  text-shadow:3px 3px 0 rgba(0,0,0,0.5);
-  letter-spacing:-1px;
+  text-shadow:none;
 }
 .sub{
-  font-family:'Caveat', cursive;
+  font-family:'8 Heavy', 'Barlow Condensed', sans-serif;
   font-size:1.8rem;
   max-width:460px;
   margin:0 auto 30px;
@@ -118,16 +136,15 @@ body{
   gap:18px;
   justify-content:center;
   flex-wrap:wrap;
-  font-size:1.1rem;
+  font-size: 2rem;
   letter-spacing:0.5px;
 }
 .meta span{
-  padding:6px 12px;
-  border:1px solid var(--marigold);
-  border-radius:20px;
+  padding:0;
 }
 .scroll-cue{
   position:absolute;
+  z-index:10;
   bottom:32px;
   left:50%;
   transform:translateX(-50%);
@@ -151,40 +168,22 @@ body{
   justify-content:center;
   position:relative;
 }
-.story-candle-field{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  overflow:hidden;
-  z-index:1;
-}
-.story-candle{
-  position:absolute;
-  height:auto;
-  transform-origin:center bottom;
-  filter:drop-shadow(0 -1px 6px rgba(242,169,0,0.35));
-  animation:storyFlicker 2.4s ease-in-out infinite;
-}
-@keyframes storyFlicker{
-  0%, 100%{opacity:0.62;}
-  50%{opacity:0.96;}
-}
 .story-inner{
   max-width:680px;
   margin:0 auto;
   padding:0 40px;
   position:relative;
-  z-index:2;
+  z-index:3;
 }
 .story p{
-  font-family:'Barlow Condensed', sans-serif;
-  font-size:1.4rem;
+  font-family:'8 Heavy', 'Barlow Condensed', sans-serif;
+  font-size:2.4rem;
   line-height:1.6;
   margin:0 0 24px;
 }
 .story .punch{
-  font-size:1.55rem;
-  color:var(--red);
+  font-size:2.55rem;
+  color:var(--marigold);
   font-weight:600;
 }
 
@@ -204,7 +203,7 @@ body{
   text-align:center;
   padding:14px;
   border-radius:4px;
-  font-family:'Caveat', cursive;
+  font-family:'8 Heavy', 'Barlow Condensed', sans-serif;
   font-size:1.5rem;
 }
 .board-simple{
@@ -234,17 +233,26 @@ body{
 }
 .macario-card-container{
   max-width:900px;
+  width:100%;
   display:flex;
-  gap:40px;
-  align-items:flex-start;
+  flex-direction:column;
+  align-items:center;
+  gap:24px;
   background:transparent;
   border:0;
   border-radius:0;
   padding:0;
   box-shadow:none;
 }
+.macario-section > .macario-card-container,
+.altar-section > .altar-card-container,
+.badges-section > .badges-container{
+  position:relative;
+  z-index:3;
+}
 .macario-poster{
-  width:280px;
+  width:100%;
+  max-width:280px;
   height:auto;
   border-radius:4px;
   flex-shrink:0;
@@ -252,6 +260,9 @@ body{
 }
 .macario-info{
   flex:1;
+  width:100%;
+  max-width:360px;
+  text-align:center;
 }
 .macario-info h2{
   font-family:'Playfair Display', serif;
@@ -288,11 +299,17 @@ body{
   align-items:center;
   justify-content:center;
 }
+.closing-section > *{
+  position:relative;
+  z-index:3;
+}
 .altar-card-container{
-  max-width:900px;
+  max-width:620px;
+  width:100%;
   display:flex;
-  gap:40px;
-  align-items:flex-start;
+  flex-direction:column;
+  align-items:center;
+  gap:24px;
   background:transparent;
   border:0;
   border-radius:0;
@@ -300,7 +317,8 @@ body{
   box-shadow:none;
 }
 .altar-image{
-  width:420px;
+  width:100%;
+  max-width:420px;
   height:520px;
   border-radius:4px;
   flex-shrink:0;
@@ -309,18 +327,19 @@ body{
   object-position:center;
 }
 .altar-info{
-  flex:1;
+  width:100%;
+  text-align:center;
 }
 .altar-info h2{
-  font-family:'Playfair Display', serif;
-  font-size:2.2rem;
-  color:var(--red);
+  font-family:'8 Heavy', 'Barlow Condensed', sans-serif;
+  font-size:4.2rem;
+  color:var(--paper);
   margin-bottom:20px;
 }
 .altar-info p{
-  font-size:1.05rem;
+  font-size:1.5rem;
   line-height:1.7;
-  color:var(--paper);
+  color:var(--marigold-light);
   margin-bottom:16px;
 }
 .altar-info p:last-child{
@@ -396,38 +415,37 @@ body{
   margin:0;
 }
 
-/* ---------- FOOTER ---------- */
-.footer{
+/* ---------- CLOSING SECTION ---------- */
+.closing-section{
   background:var(--ink);
   color:var(--paper);
   text-align:center;
   padding:60px 24px;
   position:relative;
-  border-top:8px solid var(--marigold);
-  min-height:100vh;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
 }
-.footer h2{
-  font-size:clamp(1.8rem,5vw,2.8rem);
-  color:var(--marigold-light);
-  margin-bottom:16px;
-  font-family:'Playfair Display', serif;
+.closing-date{
+  font-family:'8 Heavy', 'Barlow Condensed', sans-serif;
+  font-size:4.2rem;
+  color:var(--paper);
+  margin-bottom:20px;
 }
-.footer p{
-  font-family:'Caveat', cursive;
+.closing-title{
+  font-family:'8 Heavy', 'Barlow Condensed', sans-serif;
+  font-size:3rem;
+  color:var(--marigold);
+  line-height:1.2;
+  max-width:700px;
+  margin:0 0 36px;
+}
+.closing-details{
+  display:grid;
+  gap:14px;
+  font-family:'8 Heavy', 'Barlow Condensed', sans-serif;
   font-size:1.8rem;
-  max-width:520px;
-  margin:0 auto 8px;
-}
-.footer .fine{
-  font-family:'Barlow Condensed', sans-serif;
-  font-size:0.95rem;
-  opacity:0.75;
-  margin-top:30px;
-  letter-spacing:1px;
 }
 
 .candle-divider{
@@ -438,6 +456,8 @@ body{
   background:var(--ink);
 }
 .candle-divider img{
+  position:relative;
+  z-index:3;
   height:52px;
   width:auto;
   filter:drop-shadow(0 0 10px rgba(242,169,0,0.45));
@@ -491,67 +511,63 @@ body{
   html{
     scroll-behavior:auto;
   }
+  .candle-dot,
+  .candle-dot::before,
+  .candles{
+    animation:none;
+  }
+  .candles,
+  .candles.is-scrolling{
+    opacity:1;
+    transition:none;
+  }
 }
 </style>
 </head>
 <body>
-
+<div class="candles" id="candles" aria-hidden="true"></div>
 <section class="hero">
-  <img class="hero-img" src="https://www.fiff.ch/sites/default/files/styles/film/public/films/712935.jpg" alt="Macario, night of candles">
-  <div class="hero-vignette"></div>
-  <div class="candles" id="candles"></div>
   <div class="hero-content">
-    <span class="eyebrow">You are summoned —</span>
-    <h1>DAY OF<br>THE DEAD</h1>
-    <p class="sub">A night to gather our ghosts and party with them.</p>
+    <h1>Día de muertos</h1>
     <div class="meta">
       <span>Oct 31</span>
       <span>Villa K, Berlin</span>
       <span>6PM — Midnight</span>
     </div>
   </div>
-  <div class="scroll-cue">↓ follow the path ↓</div>
+  <div class="scroll-cue">↓</div>
 </section>
 
-<div class="candle-divider"><img src="img/diademuertos/vela.png" alt="candle"></div>
 
 <section class="story">
-  <div class="story-candle-field" id="story-candles" aria-hidden="true"></div>
   <div class="story-inner">
-    <p>This year we make a party, based on that old Mexican tradition where the alive and those who left us sooner than we thought can gather together for one more night.</p>
-    <p>We create a communal altar where we all contribute: food, drinks, a picture of our dear ones that passed away. We celebrate them all together, the Mexican way, pan de muerto, chocolate, tequila, all to honor them.</p>
-    <p class="punch">Summon your ghosts. Follow the cempasuchil path, the bridge that connects this world to the other one, and celebrate with us: the life, and the death.</p>
+    <p>This year we are having a party, based on the old Mexican tradition where the living and the dead gather for one more night.</p>
+    <p class="punch">Bring your own dead to celebrate with us.</p>
   </div>
 </section>
 
-<div class="candle-divider"><img src="img/diademuertos/vela.png" alt="candle"></div>
 
 <section class="macario-section">
   <div class="macario-card-container">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Macario_poster.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" alt="Macario film poster" class="macario-poster">
+    <img src="https://m.media-amazon.com/images/M/MV5BYTI3YjE4ZDAtZjU3Mi00ZGJiLWFkNzItZDc3ZGJlM2IwZWJiXkEyXkFqcGc@._V1_.jpg" alt="Macario film poster" class="macario-poster">
     <div class="macario-info">
-      <h2>Macario</h2>
-      <p class="screening-times">Screening at 6PM and 8PM</p>
-      <p class="synopsis">A poor woodcutter shares his only meal with Death on the Day of the Dead and receives a miraculous gift: water that cures any illness. His newfound power transforms him, but also draws the attention of the Inquisition. Based on B. Traven's story, Roberto Gavaldon's masterpiece blends Mexican folklore with surreal cinema, exploring fate, mortality, and destiny.</p>
+      <p class="screening-times">Screening at 4PM</p>
       <p class="film-credits">Dir. Roberto Gavaldon, 1960, 90 min</p>
     </div>
   </div>
 </section>
 
-<div class="candle-divider"><img src="img/diademuertos/vela.png" alt="candle"></div>
-
 <section class="altar-section">
   <div class="altar-card-container">
-    <img src="https://cdn.forbes.com.mx/2023/10/pexels-jorge-medina-14272701.webp" alt="Communal altar" class="altar-image">
+    <!-- <img src="https://cdn.forbes.com.mx/2023/10/pexels-jorge-medina-14272701.webp" alt="Communal altar" class="altar-image"> -->
     <div class="altar-info">
       <h2>The Communal Altar</h2>
-      <p>Together we build an altar to honor those who have passed. This is not decoration, it is a gathering place for remembrance. Bring a photograph of someone you want to honor, bring a food they loved when alive, bring a candle, bring flowers, bring whatever feels right.</p>
-      <p>Every offering sits side by side, creating a shared space where the living and the dead meet. We make this altar together, adding to it throughout the night, a collective gesture of love and memory.</p>
+      <p>Bring a photograph, a food they loved, a candle, flowers, whatever feels right.</p>
+      <p>Together we build an altar for our dead </p>
     </div>
   </div>
 </section>
-
-<div class="candle-divider"><img src="img/diademuertos/vela.png" alt="candle"></div>
+<!-- 
 
 <section class="badges-section">
   <ul class="badges-container">
@@ -577,58 +593,45 @@ body{
       </div>
     </li>
   </ul>
-</section>
+</section> -->
 
-<footer class="footer">
-  <p>Berlin, October 31st. See you on the other side.</p>
-  <div class="fine">DAY OF THE DEAD · BERLIN · 2026</div>
-</footer>
+<section class="closing-section">
+  <h2 class="closing-date">Berlin, October 31st</h2>
+  <div class="closing-details">
+    <p> pay what you can plus a candle.</p>
+  </div>
+</section>
 
 <script>
 const container = document.getElementById('candles');
-const storyCandles = document.getElementById('story-candles');
 const positions = [
   [5,20],[10,55],[15,35],[20,70],[25,15],[30,60],[35,40],[40,80],
   [45,25],[50,50],[55,10],[60,65],[65,30],[70,75],[75,45],[80,20],
   [85,58],[90,35],[95,68],[8,85],[92,12],[48,88],[18,8],[62,92],
   [38,5],[72,55],[28,45],[82,80],[12,65],[58,25]
 ];
-positions.forEach((p,i)=>{
-  const d = document.createElement('div');
-  d.className='candle-dot';
-  d.style.left = p[0]+'%';
-  d.style.top = p[1]+'%';
-  d.style.animationDelay = (i*0.17)+'s';
-  d.style.animationDuration = (2 + (i%5)*0.3)+'s';
-  container.appendChild(d);
+const LIGHT_MULTIPLIER = 2;
+positions.forEach((position,index)=>{
+  for(let copy = 0; copy < LIGHT_MULTIPLIER; copy++){
+    const lightIndex = index + copy * positions.length;
+    const d = document.createElement('div');
+    const yOffset = copy % 2 === 1 ? (index % 2 === 0 ? 2.5 : -2.5) : 0;
+    d.className='candle-dot';
+    d.style.left = `${Math.min(97,position[0] + copy * 2.8)}%`;
+    d.style.top = `${Math.max(2,Math.min(96,position[1] + yOffset))}%`;
+    d.style.setProperty('--flicker-delay', `${(lightIndex*0.17).toFixed(2)}s`);
+    d.style.setProperty('--flicker-duration', `${(3.6 + (lightIndex%5)*0.4).toFixed(1)}s`);
+    container.appendChild(d);
+  }
 });
 
-if(storyCandles){
-  const storyCount = window.innerWidth < 769 ? 90 : 160;
-  for(let i = 0; i < storyCount; i++){
-    const img = document.createElement('img');
-    img.className = 'story-candle';
-    img.src = 'img/diademuertos/vela.png';
-    img.alt = '';
-
-    const x = Math.random() * 98;
-    const depth = Math.pow(Math.random(), 0.38);
-    const y = 65 + (depth * 32);
-    const width = 16 + (Math.random() * 30);
-    const rotate = -19 + (Math.random() * 38);
-    const scale = 0.68 + (Math.random() * 1.02);
-    const op = 0.5 + (Math.random() * 0.48);
-
-    img.style.left = `${x}%`;
-    img.style.top = `${y}%`;
-    img.style.width = `${width}px`;
-    img.style.transform = `translate(-50%, -100%) rotate(${rotate}deg) scale(${scale})`;
-    img.style.opacity = op.toFixed(2);
-    img.style.animationDelay = `${(Math.random() * 2.4).toFixed(2)}s`;
-    img.style.animationDuration = `${(1.7 + (Math.random() * 2.2)).toFixed(2)}s`;
-
-    storyCandles.appendChild(img);
-  }
+if(container && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  let scrollTimer;
+  window.addEventListener('scroll',()=>{
+    container.classList.add('is-scrolling');
+    window.clearTimeout(scrollTimer);
+    scrollTimer = window.setTimeout(()=>container.classList.remove('is-scrolling'),220);
+  },{passive:true});
 }
 </script>
 
