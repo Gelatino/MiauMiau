@@ -1,4 +1,4 @@
-<\!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -108,6 +108,27 @@ body{
   color:var(--paper);
   z-index:10;
 }
+.hero-calavera{
+  position:fixed;
+  z-index:2;
+  top:clamp(64px,9vh,110px);
+  left:50%;
+  display:block;
+  width:clamp(120px,17vw,220px);
+  height:auto;
+  margin:0;
+  overflow:visible;
+  transform:translateX(-50%);
+  transform-origin:center;
+  transition:none;
+  pointer-events:none;
+  will-change:transform,top;
+}
+.hero-calavera [data-layer]{
+  transform-box:view-box;
+  transform-origin:center;
+  will-change:transform;
+}
 .eyebrow{
   font-size:0.95rem;
   letter-spacing:2px;
@@ -120,6 +141,7 @@ body{
   font-family:'8 Heavy', 'Barlow Condensed', sans-serif;
   font-size:clamp(4.4rem, 8vw, 6.2rem);
   line-height:1.2;
+  margin-top:clamp(120px,18vh,190px);
   margin-bottom:18px;
   font-weight:700;
   text-shadow:none;
@@ -225,11 +247,11 @@ body{
 /* ---------- MACARIO SECTION ---------- */
 .macario-section{
   background:var(--ink);
-  padding:60px 24px;
+  padding:0 24px clamp(54px,10vh,96px);
   min-height:100vh;
   display:flex;
   align-items:center;
-  justify-content:center;
+  justify-content:flex-end;
 }
 .macario-card-container{
   max-width:900px;
@@ -528,6 +550,43 @@ body{
 <div class="candles" id="candles" aria-hidden="true"></div>
 <section class="hero">
   <div class="hero-content">
+    <svg id="hero-calavera" class="hero-calavera" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350.51 525.76" role="img" aria-label="Colorful calavera skull">
+      <defs>
+        <style>
+          .calavera-red{fill:#cd3021;}
+          .calavera-black{fill:#0b0a08;}
+          .calavera-cream{fill:#ead2b0;}
+          .calavera-yellow{fill:#eba61b;}
+          .calavera-blue{fill:#073b77;}
+        </style>
+      </defs>
+      <g id="Red" data-layer="red">
+        <polygon class="calavera-red" points="22.76 27.86 68.99 27.86 82.44 469.54 17.72 469.54 22.76 27.86"/>
+        <path class="calavera-red" d="M244.65,368.12c6.72,0,89.93-26.05,89.93-26.05v130.27l-94.13,15.13,4.2-119.35Z"/>
+      </g>
+      <g id="White" data-layer="white">
+        <path class="calavera-cream" d="M103.9,334.09s26.61,69.56,27.18,70.4-.84,10.93,9.53,19.61c10.37,8.68,31.1,13.17,37.26,13.17s64.89-15.76,71.72-17.37c6.83-1.61,12.05-5.04,22.97-19.05,10.93-14.01,7.28-33.06,7.28-33.06l10.65-50.43s43.14-79,45.39-132.23c2.24-53.23-34.18-101.98-34.18-101.98,0,0-53.79-68.36-133.35-54.91-79.56,13.45-92.03,45.71-110.94,62.19-21.85,19.05-39.22,67.8-38.1,104.78s20.17,79,29.14,95.81,55.47,43.06,55.47,43.06Z"/>
+      </g>
+      <g id="Blue" data-layer="blue">
+        <polygon class="calavera-blue" points="92.52 96.37 231.2 82.93 240.44 144.28 100.72 158.71 92.52 96.37"/>
+        <polygon class="calavera-blue" points="86.64 326.66 86.64 209.84 51.34 203.95 51.34 296.4 86.64 326.66"/>
+        <path class="calavera-blue" d="M317.77,110.34s-27.04,32.55-22.07,48.37,34.96,59.09,34.96,59.09c0,0,4.87-30.67,4.39-52.19s-17.29-55.27-17.29-55.27Z"/>
+      </g>
+      <g id="Black" data-layer="black">
+        <circle class="calavera-black" cx="139.38" cy="247.45" r="46.86"/>
+        <circle class="calavera-black" cx="248.85" cy="232.41" r="46.86"/>
+        <path class="calavera-black" d="M175.25,326.66c7.2,0,55.94-8.4,55.94-8.4l-29.21-52.95-26.74,61.35Z"/>
+        <polygon class="calavera-black" points="153.54 360.28 166.48 356.08 170.69 399.78 153.54 399.78 153.54 360.28"/>
+        <polygon class="calavera-black" points="177.66 356.08 190.61 351.87 194.81 395.58 177.66 395.58 177.66 356.08"/>
+        <polygon class="calavera-black" points="198.92 351.59 211.87 347.39 215.67 395.19 200.48 394.07 198.92 351.59"/>
+        <polygon class="calavera-black" points="242.69 339.74 253.22 338.71 257.42 382.41 243.81 386.05 242.69 339.74"/>
+        <polygon class="calavera-black" points="219.78 345.43 229.52 342.07 236.93 386.47 224.76 388.86 219.78 345.43"/>
+      </g>
+      <g id="Yellow" data-layer="yellow">
+        <path class="calavera-yellow" d="M72.3,74.8c-12.61,17.65,158.9-1.12,158.9-1.12l2.12-39.1s-27.33-12.17-71.04-4.6-77.37,27.18-89.98,44.83Z"/>
+        <ellipse class="calavera-yellow" cx="64.37" cy="191.35" rx="46.65" ry="52.11"/>
+      </g>
+    </svg>
     <h1>Día de muertos</h1>
     <div class="meta">
       <span>Oct 31</span>
@@ -604,6 +663,61 @@ body{
 
 <script>
 const container = document.getElementById('candles');
+const calavera = document.getElementById('hero-calavera');
+if(calavera) document.body.appendChild(calavera);
+const calaveraLayers = calavera ? [...calavera.querySelectorAll('[data-layer]')] : [];
+const calaveraLayerMotion = [
+  {rotation:-12},
+  {rotation:8},
+  {rotation:14},
+  {rotation:-10},
+  {rotation:12}
+];
+const scrollSections = [...document.querySelectorAll('body > section')];
+const scrollIntervals = Math.max(1,scrollSections.length-1);
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let calaveraFrame = null;
+function updateCalavera(){
+  calaveraFrame = null;
+  if(!calavera || reduceMotion) return;
+  const maxScroll = Math.max(1,document.documentElement.scrollHeight-window.innerHeight);
+  const progress = Math.max(0,Math.min(1,window.scrollY/maxScroll));
+  const spread = progress===0 || progress===1 ? 0 : Math.sin(Math.PI*progress);
+  const approachCenter = Math.min(1,progress/0.14);
+  const endingProgress = Math.max(0,Math.min(1,(progress-0.82)/0.18));
+  const orbit = progress*Math.PI*2*scrollIntervals*0.72;
+  const expandedScale = window.innerWidth<600 ? 1.12 : 1.35;
+  const orbitRadius = Math.min(window.innerWidth*0.07,54);
+  const safeRadius = (window.innerWidth-calavera.clientWidth*expandedScale)/2-orbitRadius-18;
+  const spreadRadius = Math.max(24,Math.min(window.innerWidth*0.3,230,safeRadius));
+  const startTop = Math.max(64,Math.min(110,window.innerHeight*0.09));
+  const centerTop = startTop+(window.innerHeight/2-startTop)*approachCenter;
+  const endingTop = Math.max(28,Math.min(54,window.innerHeight*0.05));
+  calavera.style.top = `${centerTop+(endingTop-centerTop)*endingProgress}px`;
+  calavera.style.opacity = `${1-spread*0.7}`;
+  const verticalAnchor = approachCenter*(1-endingProgress);
+  const scale = (1+spread*(expandedScale-1))*(1-endingProgress*0.25);
+  calavera.style.transform = `translate(-50%,-${verticalAnchor*50}%) scale(${scale})`;
+  calaveraLayers.forEach((layer,index)=>{
+    const motion = calaveraLayerMotion[index];
+    const radialAngle = -Math.PI/2+index*Math.PI*2/calaveraLayers.length;
+    const orbitAngle = orbit+radialAngle;
+    const x = spread*(Math.cos(radialAngle)*spreadRadius+Math.cos(orbitAngle)*orbitRadius);
+    const y = spread*(Math.sin(radialAngle)*spreadRadius+Math.sin(orbitAngle)*orbitRadius);
+    const rotation = spread*(motion.rotation+Math.sin(orbitAngle)*10);
+    layer.style.transform = `translate(${x}px,${y}px) rotate(${rotation}deg)`;
+  });
+}
+function requestCalaveraUpdate(){
+  if(calaveraFrame===null) calaveraFrame=window.requestAnimationFrame(updateCalavera);
+}
+if(calavera){
+  updateCalavera();
+  if(!reduceMotion){
+    window.addEventListener('scroll',requestCalaveraUpdate,{passive:true});
+    window.addEventListener('resize',requestCalaveraUpdate);
+  }
+}
 const positions = [
   [5,20],[10,55],[15,35],[20,70],[25,15],[30,60],[35,40],[40,80],
   [45,25],[50,50],[55,10],[60,65],[65,30],[70,75],[75,45],[80,20],
@@ -633,6 +747,7 @@ if(container && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
     scrollTimer = window.setTimeout(()=>container.classList.remove('is-scrolling'),220);
   },{passive:true});
 }
+
 </script>
 
 </body>
