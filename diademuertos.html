@@ -35,6 +35,7 @@ body{
 .story,
 .macario-section,
 .altar-section,
+.music-section,
 .badges-section,
 .closing-section{
   scroll-snap-align:start;
@@ -368,6 +369,66 @@ body{
   margin-bottom:0;
 }
 
+/* ---------- MUSIC SECTION ---------- */
+.music-section{
+  background:var(--ink);
+  padding:60px 24px;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.music-section > .music-container{
+  position:relative;
+  z-index:3;
+}
+.music-container{
+  max-width:820px;
+  width:100%;
+  text-align:center;
+}
+.music-title{
+  font-family:'8 Heavy', 'Barlow Condensed', sans-serif;
+  font-size:4.2rem;
+  color:var(--paper);
+  margin-bottom:40px;
+}
+.performer-grid{
+  display:flex;
+  justify-content:center;
+  gap:56px;
+  flex-wrap:wrap;
+}
+.performer-card{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  text-decoration:none;
+  color:inherit;
+}
+.performer-mask{
+  width:clamp(160px,26vw,240px);
+  height:auto;
+  filter:drop-shadow(0 10px 24px rgba(0,0,0,0.45));
+  transition:transform 300ms ease,filter 300ms ease;
+}
+.performer-card:hover .performer-mask,
+.performer-card:focus-visible .performer-mask{
+  transform:scale(1.04);
+  filter:drop-shadow(0 14px 30px rgba(0,0,0,0.55));
+}
+.performer-name{
+  font-family:'8 Heavy', 'Barlow Condensed', sans-serif;
+  font-size:1.9rem;
+  color:var(--marigold-light);
+}
+.performer-role{
+  font-size:1.1rem;
+  color:var(--paper);
+  opacity:0.85;
+}
+
 /* ---------- BADGES (entertainment / decor / food) ---------- */
 .badges-section{
   background:var(--ink);
@@ -494,9 +555,13 @@ body{
 @media(max-width:768px){
   .macario-section,
   .altar-section,
+  .music-section,
   .badges-section{
     min-height:100vh;
     align-items:center;
+  }
+  .performer-grid{
+    gap:32px;
   }
   .macario-card-container {
     flex-direction:column;
@@ -623,6 +688,38 @@ body{
       <h2>The Communal Altar</h2>
       <p>Bring a photograph, a food they loved, a candle, flowers, whatever feels right.</p>
       <p>Together we build an altar for our dead </p>
+    </div>
+  </div>
+</section>
+
+<section class="music-section">
+  <div class="music-container">
+    <h2 class="music-title">Live Music</h2>
+    <div class="performer-grid">
+      <a class="performer-card" href="https://www.instagram.com/frieda.music/" target="_blank" rel="noopener">
+        <svg class="performer-mask" viewBox="0 0 350.51 525.76" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Frieda's photo, revealed inside a calavera silhouette">
+          <defs>
+            <clipPath id="performer-mask-frieda" clipPathUnits="userSpaceOnUse">
+              <path d="M103.9,334.09s26.61,69.56,27.18,70.4-.84,10.93,9.53,19.61c10.37,8.68,31.1,13.17,37.26,13.17s64.89-15.76,71.72-17.37c6.83-1.61,12.05-5.04,22.97-19.05,10.93-14.01,7.28-33.06,7.28-33.06l10.65-50.43s43.14-79,45.39-132.23c2.24-53.23-34.18-101.98-34.18-101.98,0,0-53.79-68.36-133.35-54.91-79.56,13.45-92.03,45.71-110.94,62.19-21.85,19.05-39.22,67.8-38.1,104.78s20.17,79,29.14,95.81,55.47,43.06,55.47,43.06Z"/>
+            </clipPath>
+          </defs>
+          <image href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWiV-rTqKmXpqj7cKiwXZpqYF4kpuj7-3hmA7xKqQ8HPl2l29QAkD5OE3a&amp;s=10" xlink:href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWiV-rTqKmXpqj7cKiwXZpqYF4kpuj7-3hmA7xKqQ8HPl2l29QAkD5OE3a&amp;s=10" width="350.51" height="525.76" preserveAspectRatio="xMidYMid slice" clip-path="url(#performer-mask-frieda)"/>
+        </svg>
+        <span class="performer-name">Frieda</span>
+        <span class="performer-role">Live music</span>
+      </a>
+      <a class="performer-card" href="https://www.instagram.com/costaleroo/" target="_blank" rel="noopener">
+        <svg class="performer-mask" viewBox="0 0 350.51 525.76" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="DJ Costalero's photo, revealed inside a calavera silhouette">
+          <defs>
+            <clipPath id="performer-mask-costalero" clipPathUnits="userSpaceOnUse">
+              <path transform="translate(350.51,0) scale(-1,1)" d="M103.9,334.09s26.61,69.56,27.18,70.4-.84,10.93,9.53,19.61c10.37,8.68,31.1,13.17,37.26,13.17s64.89-15.76,71.72-17.37c6.83-1.61,12.05-5.04,22.97-19.05,10.93-14.01,7.28-33.06,7.28-33.06l10.65-50.43s43.14-79,45.39-132.23c2.24-53.23-34.18-101.98-34.18-101.98,0,0-53.79-68.36-133.35-54.91-79.56,13.45-92.03,45.71-110.94,62.19-21.85,19.05-39.22,67.8-38.1,104.78s20.17,79,29.14,95.81,55.47,43.06,55.47,43.06Z"/>
+            </clipPath>
+          </defs>
+          <image href="https://i1.sndcdn.com/avatars-L4rqzPYFzdxDbeil-CusWJA-t240x240.jpg" xlink:href="https://i1.sndcdn.com/avatars-L4rqzPYFzdxDbeil-CusWJA-t240x240.jpg" width="350.51" height="525.76" preserveAspectRatio="xMidYMid slice" clip-path="url(#performer-mask-costalero)"/>
+        </svg>
+        <span class="performer-name">DJ Costalero</span>
+        <span class="performer-role">DJ set</span>
+      </a>
     </div>
   </div>
 </section>
