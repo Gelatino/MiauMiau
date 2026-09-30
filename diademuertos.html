@@ -28,6 +28,7 @@ body{
   background:var(--ink);
   color:var(--paper);
   font-family:'Barlow Condensed', sans-serif;
+  font-weight:500;
   line-height:1.5;
 }
 
@@ -36,6 +37,7 @@ body{
 .macario-section,
 .altar-section,
 .music-section,
+.candleholder-section,
 .badges-section,
 .closing-section{
   scroll-snap-align:start;
@@ -269,6 +271,7 @@ body{
 }
 .macario-section > .macario-card-container,
 .altar-section > .altar-card-container,
+.candleholder-section > .candleholder-container,
 .badges-section > .badges-container{
   position:relative;
   z-index:3;
@@ -367,6 +370,70 @@ body{
 }
 .altar-info p:last-child{
   margin-bottom:0;
+}
+
+/* ---------- CANDLEHOLDER EXHIBITION ---------- */
+.candleholder-section{
+  background:var(--ink);
+  padding:60px 24px;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.candleholder-container{
+  max-width:900px;
+  width:100%;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  align-items:center;
+  gap:clamp(32px,8vw,96px);
+}
+.candleholder-art{
+  display:block;
+  width:min(100%,300px);
+  max-height:68vh;
+  justify-self:center;
+  overflow:visible;
+  filter:drop-shadow(0 12px 24px rgba(0,0,0,0.45));
+}
+.candleholder-part{
+  opacity:1;
+  transform-box:view-box;
+  transform-origin:0 0;
+  transition:transform 900ms cubic-bezier(0.2,0.75,0.2,1),opacity 450ms ease;
+}
+.candleholder-art.is-assembling .candleholder-part-candle{
+  transform:translate(-30%,-20%);
+}
+.candleholder-art.is-assembling .candleholder-part-fire{
+  transform:translate(-30%,28%);
+}
+.candleholder-art.is-assembled .candleholder-part{
+  opacity:1;
+  transform:translate(0,0);
+}
+.candleholder-info{
+  text-align:left;
+}
+.candleholder-info h2{
+  font-family:'8 Heavy', 'Barlow Condensed', sans-serif;
+  font-size:clamp(2.8rem,5vw,4.2rem);
+  font-weight:700;
+  line-height:1.05;
+  color:var(--paper);
+  margin-bottom:22px;
+}
+.candleholder-info p{
+  font-size:1.5rem;
+  font-weight:600;
+  line-height:1.6;
+  color:var(--marigold-light);
+  margin-bottom:14px;
+}
+.candleholder-info p:last-child{
+  margin-bottom:0;
+  color:var(--paper);
 }
 
 /* ---------- MUSIC SECTION ---------- */
@@ -555,6 +622,7 @@ body{
 @media(max-width:768px){
   .macario-section,
   .altar-section,
+  .candleholder-section,
   .music-section,
   .badges-section{
     min-height:100vh;
@@ -580,6 +648,24 @@ body{
   .altar-image {
     width:100%;
     height:360px;
+  }
+  .candleholder-container{
+    grid-template-columns:1fr;
+    gap:28px;
+  }
+  .candleholder-art{
+    width:min(58vw,230px);
+    max-height:48vh;
+  }
+  .candleholder-info{
+    text-align:center;
+    max-width:560px;
+  }
+  .candleholder-info h2{
+    margin-bottom:14px;
+  }
+  .candleholder-info p{
+    font-size:1.25rem;
   }
   .badges-container{
     gap:22px;
@@ -723,33 +809,28 @@ body{
     </div>
   </div>
 </section>
-<!-- 
+<section class="candleholder-section">
+  <div class="candleholder-container">
+    <svg class="candleholder-art" viewBox="0 0 520 420" role="img" aria-label="A candle assembling from the center of a colorful calaverita">
+      <g class="candleholder-part candleholder-part-candle">
+        <g transform="translate(257 0) scale(0.68) translate(-520 -120)">
+          <polygon fill="#cd3021" points="597.93 290.92 644.15 290.92 657.6 732.61 592.88 732.61 597.93 290.92"/>
+        </g>
+      </g>
+      <g class="candleholder-part candleholder-part-fire">
+        <g transform="translate(257 0) scale(0.68) translate(-520 -120)">
+          <path fill="#eba61b" d="M622.74,272.94s-31.36-26.47-29.8-60.29,40.21-73.82,40.21-73.82c0,0,22.52,67.06,43.7,67.06s-54.12,67.06-54.12,67.06Z"/>
+          <path fill="#efd7ab" d="M622.62,258.82s-15.68-13.24-14.9-30.15c.78-16.91,20.11-36.91,20.11-36.91,0,0,11.26,33.53,21.85,33.53s-27.06,33.53-27.06,33.53Z"/>
+        </g>
+      </g>
+    </svg>
+    <div class="candleholder-info">
+      <h2>Candleholder Exhibition</h2>
+      <p>Discover and buy candleholders made by Berlin ceramic artists.</p>
+    </div>
+  </div>
+</section>
 
-<section class="badges-section">
-  <ul class="badges-container">
-    <li class="badge">
-      <img class="badge-icon" src="img/diademuertos/calaverita.png" alt="calaverita bullet">
-      <div>
-        <h4>Music</h4>
-        <p>Live cantautor, then a DJ after the film. All Latin, all night.</p>
-      </div>
-    </li>
-    <li class="badge">
-      <img class="badge-icon" src="img/diademuertos/calaverita.png" alt="calaverita bullet">
-      <div>
-        <h4>La Catrina</h4>
-        <p>Traditional Catrina makeup available on site, art not costume.</p>
-      </div>
-    </li>
-    <li class="badge">
-      <img class="badge-icon" src="img/diademuertos/calaverita.png" alt="calaverita bullet">
-      <div>
-        <h4>Table</h4>
-        <p>Pan de muerto, chocolate, tequila, the offerings, shared by all.</p>
-      </div>
-    </li>
-  </ul>
-</section> -->
 
 <section class="closing-section">
   <h2 class="closing-date">Berlin, October 31st</h2>
@@ -773,6 +854,17 @@ const calaveraLayerMotion = [
 const scrollSections = [...document.querySelectorAll('body > section')];
 const scrollIntervals = Math.max(1,scrollSections.length-1);
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const candleholderArt = document.querySelector('.candleholder-art');
+if(candleholderArt && !reduceMotion && 'IntersectionObserver' in window){
+  candleholderArt.classList.add('is-assembling');
+  const candleholderObserver = new IntersectionObserver(entries=>{
+    if(entries.some(entry=>entry.isIntersecting)){
+      requestAnimationFrame(()=>candleholderArt.classList.add('is-assembled'));
+      candleholderObserver.disconnect();
+    }
+  },{threshold:0.45});
+  candleholderObserver.observe(candleholderArt);
+}
 let calaveraFrame = null;
 function updateCalavera(){
   calaveraFrame = null;
@@ -791,7 +883,7 @@ function updateCalavera(){
   const centerTop = startTop+(window.innerHeight/2-startTop)*approachCenter;
   const endingTop = Math.max(28,Math.min(54,window.innerHeight*0.05));
   calavera.style.top = `${centerTop+(endingTop-centerTop)*endingProgress}px`;
-  calavera.style.opacity = `${1-spread*0.7}`;
+  calavera.style.opacity = `${1-spread*.7}`;
   const verticalAnchor = approachCenter*(1-endingProgress);
   const scale = (1+spread*(expandedScale-1))*(1-endingProgress*0.25);
   calavera.style.transform = `translate(-50%,-${verticalAnchor*50}%) scale(${scale})`;
