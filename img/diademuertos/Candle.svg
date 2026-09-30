@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1280 1024">
+  <!-- Generator: Adobe Illustrator 30.8.2, SVG Export Plug-In . SVG Version: 2.1.4 Build 7)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #cd3021;
+      }
+
+      .st1 {
+        fill: #efd7ab;
+      }
+
+      .st2 {
+        fill: #eba61b;
+      }
+    </style>
+  </defs>
+  <g id="Candle">
+    <polygon class="st0" points="597.93 290.92 644.15 290.92 657.6 732.61 592.88 732.61 597.93 290.92"/>
+  </g>
+  <g id="Fire">
+    <path class="st2" d="M622.74,272.94s-31.36-26.47-29.8-60.29,40.21-73.82,40.21-73.82c0,0,22.52,67.06,43.7,67.06s-54.12,67.06-54.12,67.06Z"/>
+    <path class="st1" d="M622.62,258.82s-15.68-13.24-14.9-30.15c.78-16.91,20.11-36.91,20.11-36.91,0,0,11.26,33.53,21.85,33.53s-27.06,33.53-27.06,33.53Z"/>
+  </g>
+</svg>
