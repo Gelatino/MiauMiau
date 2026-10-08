@@ -34,6 +34,7 @@ body{
 
 .hero,
 .story,
+.program-section,
 .macario-section,
 .altar-section,
 .music-section,
@@ -619,6 +620,158 @@ body{
   margin:0;
 }
 
+.program-section{
+  min-height:100vh;
+  padding:72px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--ink);
+}
+.program-card{
+  width:min(100%,820px);
+}
+.program-heading{
+  margin-bottom:36px;
+  text-align:center;
+}
+.program-heading h2{
+  font-family:'8 Heavy', 'Barlow Condensed', sans-serif;
+  font-size:clamp(2.9rem,6.5vw,4.3rem);
+  color:var(--paper);
+}
+.program-heading p{
+  color:var(--marigold-light);
+  font-size:1.35rem;
+}
+.program-list{
+  display:grid;
+  gap:8px;
+}
+.program-item{
+  width:100%;
+  display:grid;
+  grid-template-columns:110px minmax(0,1fr) 24px;
+  align-items:center;
+  gap:20px;
+  padding:20px 14px;
+  color:var(--paper);
+  text-align:left;
+  font:inherit;
+  background:transparent;
+  border:0;
+  cursor:pointer;
+  transition:font-size 180ms ease;
+}
+.program-item:hover,
+.program-item:focus-visible{
+  background:transparent;
+}
+.program-item:focus-visible{
+  outline:2px solid var(--marigold-light);
+  outline-offset:3px;
+}
+.program-time{
+  color:var(--marigold-light);
+  font-size:1.54rem;
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+  transition:font-size 180ms ease;
+}
+.program-name{
+  font-family:'8 Heavy', 'Barlow Condensed', sans-serif;
+  font-size:clamp(1.375rem,3.3vw,1.815rem);
+  transition:font-size 180ms ease;
+}
+.program-item:hover .program-time,
+.program-item:focus-visible .program-time{
+  font-size:1.9375rem;
+}
+.program-item:hover .program-name,
+.program-item:focus-visible .program-name{
+  font-size:clamp(1.75rem,4.125vw,2.25rem);
+}
+.program-arrow{
+  color:var(--marigold);
+  font-size:1.7rem;
+}
+.program-dialog{
+  position:fixed;
+  inset:0;
+  margin:auto;
+  width:min(92vw,760px);
+  max-width:none;
+  max-height:90vh;
+  height:fit-content;
+  padding:0;
+  overflow:auto;
+  color:var(--paper);
+  background:transparent;
+  border:0;
+  box-shadow:none;
+}
+.program-dialog::backdrop{
+  background:rgba(0,0,0,0.42);
+  backdrop-filter:blur(10px);
+}
+.program-dialog-inner{
+  position:relative;
+  padding:clamp(20px,5vw,42px);
+}
+.program-detail{
+  text-align:center;
+}
+.program-detail h2{
+  margin:4px 0 24px;
+  color:var(--marigold-light);
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,5vw,2.8rem);
+  line-height:1.2;
+}
+.program-detail p{
+  margin:0 0 14px;
+  font-size:1.35rem;
+  line-height:1.65;
+}
+.program-detail p:last-child{
+  margin-bottom:0;
+}
+.program-detail .detail-meta{
+  color:var(--marigold-light);
+  font-weight:700;
+}
+.program-detail img{
+  display:block;
+  width:min(100%,300px);
+  max-height:390px;
+  margin:0 auto 22px;
+  object-fit:cover;
+  border-radius:4px;
+}
+.program-detail .performer-mask{
+  width:min(100%,260px);
+  max-height:390px;
+  margin:0 auto 22px;
+  filter:drop-shadow(0 10px 24px rgba(0,0,0,0.45));
+}
+.program-detail .instagram-link{
+  display:block;
+  width:24px;
+  height:24px;
+  margin:0 auto 18px;
+}
+.program-detail .instagram-link img{
+  display:block;
+  width:24px;
+  height:24px;
+  margin:0;
+  object-fit:contain;
+}
+.program-detail a{
+  color:var(--marigold-light);
+  text-underline-offset:4px;
+}
+
 @media(max-width:768px){
   .macario-section,
   .altar-section,
@@ -677,6 +830,22 @@ body{
     width:auto;
     margin-left:0;
     transform:none;
+  }
+  .program-item{
+    grid-template-columns:82px minmax(0,1fr) 20px;
+    gap:12px;
+    padding:17px 4px;
+  }
+  .program-time{
+    font-size:1.265rem;
+  }
+  .program-item:hover .program-time,
+  .program-item:focus-visible .program-time{
+    font-size:1.625rem;
+  }
+  .program-item:hover .program-name,
+  .program-item:focus-visible .program-name{
+    font-size:clamp(1.6875rem,5.5vw,2.0625rem);
   }
 }
 
@@ -757,79 +926,110 @@ body{
 </section>
 
 
-<section class="macario-section">
-  <div class="macario-card-container">
-    <img src="https://m.media-amazon.com/images/M/MV5BYTI3YjE4ZDAtZjU3Mi00ZGJiLWFkNzItZDc3ZGJlM2IwZWJiXkEyXkFqcGc@._V1_.jpg" alt="Macario film poster" class="macario-poster">
-    <div class="macario-info">
-      <p class="screening-times">Screening at 4PM</p>
-      <p class="film-credits">Dir. Roberto Gavaldon, 1960, 90 min</p>
+<section class="program-section" aria-labelledby="program-title">
+  <div class="program-card">
+    <div class="program-heading">
+      <h2 id="program-title">The Program</h2>
+    </div>
+    <div class="program-list">
+      <button class="program-item" type="button" data-detail="detail-macario">
+        <span class="program-time">16:00</span>
+        <span class="program-name">Film · Macario</span>
+      </button>
+      <button class="program-item" type="button" data-detail="detail-candleholders">
+        <span class="program-time">18:00</span>
+        <span class="program-name">Candleholder Exhibition</span>
+      </button>
+      <button class="program-item" type="button" data-detail="detail-frieda">
+        <span class="program-time">19:00</span>
+        <span class="program-name">Live music · Frieda</span>
+      </button>
+      <button class="program-item" type="button" data-detail="detail-monologue">
+        <span class="program-time">20:00</span>
+        <span class="program-name">Monologue at the communal altar</span>
+      </button>
+      <button class="program-item" type="button" data-detail="detail-olivia">
+        <span class="program-time">21:00</span>
+        <span class="program-name">DJ TBD</span>
+      </button>
+      <button class="program-item" type="button" data-detail="detail-costalero">
+        <span class="program-time">22:30</span>
+        <span class="program-name">DJ Costalero</span>
+      </button>
     </div>
   </div>
 </section>
 
-<section class="altar-section">
-  <div class="altar-card-container">
-    <!-- <img src="https://cdn.forbes.com.mx/2023/10/pexels-jorge-medina-14272701.webp" alt="Communal altar" class="altar-image"> -->
-    <div class="altar-info">
-      <h2>The Communal Altar</h2>
-      <p>Bring a photograph, a food they loved, a candle, flowers, whatever feels right.</p>
-      <p>Together we build an altar for our dead </p>
-    </div>
+<dialog class="program-dialog" aria-label="Program event details">
+  <div class="program-dialog-inner">
+    <div class="program-dialog-content"></div>
   </div>
-</section>
+</dialog>
 
-<section class="music-section">
-  <div class="music-container">
-    <h2 class="music-title">Live Music</h2>
-    <div class="performer-grid">
-      <a class="performer-card" href="https://www.instagram.com/frieda.music/" target="_blank" rel="noopener">
-        <svg class="performer-mask" viewBox="0 0 350.51 525.76" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Frieda's photo, revealed inside a calavera silhouette">
-          <defs>
-            <clipPath id="performer-mask-frieda" clipPathUnits="userSpaceOnUse">
-              <path d="M103.9,334.09s26.61,69.56,27.18,70.4-.84,10.93,9.53,19.61c10.37,8.68,31.1,13.17,37.26,13.17s64.89-15.76,71.72-17.37c6.83-1.61,12.05-5.04,22.97-19.05,10.93-14.01,7.28-33.06,7.28-33.06l10.65-50.43s43.14-79,45.39-132.23c2.24-53.23-34.18-101.98-34.18-101.98,0,0-53.79-68.36-133.35-54.91-79.56,13.45-92.03,45.71-110.94,62.19-21.85,19.05-39.22,67.8-38.1,104.78s20.17,79,29.14,95.81,55.47,43.06,55.47,43.06Z"/>
-            </clipPath>
-          </defs>
-          <image href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWiV-rTqKmXpqj7cKiwXZpqYF4kpuj7-3hmA7xKqQ8HPl2l29QAkD5OE3a&amp;s=10" xlink:href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWiV-rTqKmXpqj7cKiwXZpqYF4kpuj7-3hmA7xKqQ8HPl2l29QAkD5OE3a&amp;s=10" width="350.51" height="525.76" preserveAspectRatio="xMidYMid slice" clip-path="url(#performer-mask-frieda)"/>
-        </svg>
-        <span class="performer-name">Frieda</span>
-        <span class="performer-role">Live music</span>
-      </a>
-      <a class="performer-card" href="https://www.instagram.com/costaleroo/" target="_blank" rel="noopener">
-        <svg class="performer-mask" viewBox="0 0 350.51 525.76" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="DJ Costalero's photo, revealed inside a calavera silhouette">
-          <defs>
-            <clipPath id="performer-mask-costalero" clipPathUnits="userSpaceOnUse">
-              <path transform="translate(350.51,0) scale(-1,1)" d="M103.9,334.09s26.61,69.56,27.18,70.4-.84,10.93,9.53,19.61c10.37,8.68,31.1,13.17,37.26,13.17s64.89-15.76,71.72-17.37c6.83-1.61,12.05-5.04,22.97-19.05,10.93-14.01,7.28-33.06,7.28-33.06l10.65-50.43s43.14-79,45.39-132.23c2.24-53.23-34.18-101.98-34.18-101.98,0,0-53.79-68.36-133.35-54.91-79.56,13.45-92.03,45.71-110.94,62.19-21.85,19.05-39.22,67.8-38.1,104.78s20.17,79,29.14,95.81,55.47,43.06,55.47,43.06Z"/>
-            </clipPath>
-          </defs>
-          <image href="https://i1.sndcdn.com/avatars-L4rqzPYFzdxDbeil-CusWJA-t240x240.jpg" xlink:href="https://i1.sndcdn.com/avatars-L4rqzPYFzdxDbeil-CusWJA-t240x240.jpg" width="350.51" height="525.76" preserveAspectRatio="xMidYMid slice" clip-path="url(#performer-mask-costalero)"/>
-        </svg>
-        <span class="performer-name">DJ Costalero</span>
-        <span class="performer-role">DJ set</span>
-      </a>
-    </div>
-  </div>
-</section>
-<section class="candleholder-section">
-  <div class="candleholder-container">
-    <svg class="candleholder-art" viewBox="0 0 520 420" role="img" aria-label="A candle assembling from the center of a colorful calaverita">
-      <g class="candleholder-part candleholder-part-candle">
-        <g transform="translate(257 0) scale(0.68) translate(-520 -120)">
-          <polygon fill="#cd3021" points="597.93 290.92 644.15 290.92 657.6 732.61 592.88 732.61 597.93 290.92"/>
-        </g>
-      </g>
-      <g class="candleholder-part candleholder-part-fire">
-        <g transform="translate(257 0) scale(0.68) translate(-520 -120)">
-          <path fill="#eba61b" d="M622.74,272.94s-31.36-26.47-29.8-60.29,40.21-73.82,40.21-73.82c0,0,22.52,67.06,43.7,67.06s-54.12,67.06-54.12,67.06Z"/>
-          <path fill="#efd7ab" d="M622.62,258.82s-15.68-13.24-14.9-30.15c.78-16.91,20.11-36.91,20.11-36.91,0,0,11.26,33.53,21.85,33.53s-27.06,33.53-27.06,33.53Z"/>
-        </g>
-      </g>
+<template id="detail-macario">
+  <article class="program-detail">
+    <img src="https://m.media-amazon.com/images/M/MV5BYTI3YjE4ZDAtZjU3Mi00ZGJiLWFkNzItZDc3ZGJlM2IwZWJiXkEyXkFqcGc@._V1_.jpg" alt="Macario film poster">
+    <!-- <h2 id="program-dialog-title">Film · Macario</h2> -->
+    <p>Directed by Roberto Gavaldón · 1960 · 90 min</p>
+  </article>
+</template>
+
+<template id="detail-candleholders">
+  <article class="program-detail">
+    <h2>Candleholder Exhibition</h2>
+    <p>Discover and buy candleholders made by Berlin ceramic artists.</p>
+  </article>
+</template>
+
+<template id="detail-frieda">
+  <article class="program-detail">
+    <svg class="performer-mask" viewBox="0 0 350.51 525.76" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Frieda's photo inside a calavera silhouette">
+      <defs>
+        <clipPath id="performer-mask-frieda-detail" clipPathUnits="userSpaceOnUse">
+          <path d="M103.9,334.09s26.61,69.56,27.18,70.4-.84,10.93,9.53,19.61c10.37,8.68,31.1,13.17,37.26,13.17s64.89-15.76,71.72-17.37c6.83-1.61,12.05-5.04,22.97-19.05,10.93-14.01,7.28-33.06,7.28-33.06l10.65-50.43s43.14-79,45.39-132.23c2.24-53.23-34.18-101.98-34.18-101.98,0,0-53.79-68.36-133.35-54.91-79.56,13.45-92.03,45.71-110.94,62.19-21.85,19.05-39.22,67.8-38.1,104.78s20.17,79,29.14,95.81,55.47,43.06,55.47,43.06Z"/>
+        </clipPath>
+      </defs>
+      <image href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWiV-rTqKmXpqj7cKiwXZpqYF4kpuj7-3hmA7xKqQ8HPl2l29QAkD5OE3a&amp;s=10" xlink:href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWiV-rTqKmXpqj7cKiwXZpqYF4kpuj7-3hmA7xKqQ8HPl2l29QAkD5OE3a&amp;s=10" width="350.51" height="525.76" preserveAspectRatio="xMidYMid slice" clip-path="url(#performer-mask-frieda-detail)"/>
     </svg>
-    <div class="candleholder-info">
-      <h2>Candleholder Exhibition</h2>
-      <p>Discover and buy candleholders made by Berlin ceramic artists.</p>
-    </div>
-  </div>
-</section>
+    <a class="instagram-link" href="https://www.instagram.com/frieda.music/" target="_blank" rel="noopener noreferrer" aria-label="Frieda on Instagram">
+      <img src="img/icons8-instagram-24.png" alt="">
+    </a>
+    <p>Live music by Frieda.</p>
+
+  </article>
+</template>
+
+<template id="detail-monologue">
+  <article class="program-detail">
+    <h2>Monologue</h2>
+    <p>Bring a photograph, a food they loved, drinks, cigarettes, a candle, flowers, a cat, or anything else that reminds you of them.</p>
+  </article>
+</template>
+
+<template id="detail-olivia">
+  <article class="program-detail">
+    <h2>DJ TBD</h2>
+    <p class="detail-meta">21:00 · DJ set</p>
+  </article>
+</template>
+
+<template id="detail-costalero">
+  <article class="program-detail">
+    <svg class="performer-mask" viewBox="0 0 350.51 525.76" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="DJ Costalero's photo inside a calavera silhouette">
+      <defs>
+        <clipPath id="performer-mask-costalero-detail" clipPathUnits="userSpaceOnUse">
+          <path transform="translate(350.51,0) scale(-1,1)" d="M103.9,334.09s26.61,69.56,27.18,70.4-.84,10.93,9.53,19.61c10.37,8.68,31.1,13.17,37.26,13.17s64.89-15.76,71.72-17.37c6.83-1.61,12.05-5.04,22.97-19.05,10.93-14.01,7.28-33.06,7.28-33.06l10.65-50.43s43.14-79,45.39-132.23c2.24-53.23-34.18-101.98-34.18-101.98,0,0-53.79-68.36-133.35-54.91-79.56,13.45-92.03,45.71-110.94,62.19-21.85,19.05-39.22,67.8-38.1,104.78s20.17,79,29.14,95.81,55.47,43.06,55.47,43.06Z"/>
+        </clipPath>
+      </defs>
+      <image href="https://i1.sndcdn.com/avatars-L4rqzPYFzdxDbeil-CusWJA-t240x240.jpg" xlink:href="https://i1.sndcdn.com/avatars-L4rqzPYFzdxDbeil-CusWJA-t240x240.jpg" width="350.51" height="525.76" preserveAspectRatio="xMidYMid slice" clip-path="url(#performer-mask-costalero-detail)"/>
+    </svg>
+    <a class="instagram-link" href="https://www.instagram.com/costaleroo/" target="_blank" rel="noopener noreferrer" aria-label="Costalero on Instagram">
+      <img src="img/icons8-instagram-24.png" alt="">
+    </a>
+    <p>Music by DJ Costalero.</p>
+    
+  </article>
+</template>
 
 
 <section class="closing-section">
@@ -854,17 +1054,25 @@ const calaveraLayerMotion = [
 const scrollSections = [...document.querySelectorAll('body > section')];
 const scrollIntervals = Math.max(1,scrollSections.length-1);
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const candleholderArt = document.querySelector('.candleholder-art');
-if(candleholderArt && !reduceMotion && 'IntersectionObserver' in window){
-  candleholderArt.classList.add('is-assembling');
-  const candleholderObserver = new IntersectionObserver(entries=>{
-    if(entries.some(entry=>entry.isIntersecting)){
-      requestAnimationFrame(()=>candleholderArt.classList.add('is-assembled'));
-      candleholderObserver.disconnect();
-    }
-  },{threshold:0.45});
-  candleholderObserver.observe(candleholderArt);
-}
+const programDialog = document.querySelector('.program-dialog');
+const programDialogContent = document.querySelector('.program-dialog-content');
+let lastProgramTrigger = null;
+document.querySelectorAll('.program-item').forEach(item=>{
+  item.addEventListener('click',()=>{
+    const detail = document.getElementById(item.dataset.detail);
+    if(!detail || !programDialog || !programDialogContent) return;
+    programDialogContent.replaceChildren(detail.content.cloneNode(true));
+    lastProgramTrigger = item;
+    programDialog.showModal();
+  });
+});
+programDialog.addEventListener('click',event=>{
+  if(event.target === programDialog) programDialog.close();
+});
+programDialog.addEventListener('close',()=>{
+  programDialogContent.replaceChildren();
+  lastProgramTrigger?.focus();
+});
 let calaveraFrame = null;
 function updateCalavera(){
   calaveraFrame = null;
