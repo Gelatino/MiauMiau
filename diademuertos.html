@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Day of the Dead — Berlin</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-LDXSLTCWTK"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-LDXSLTCWTK');
+</script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Caveat:wght@600;700&family=Barlow+Condensed:wght@400;500;600;700&display=swap');
 
@@ -941,6 +950,11 @@ body{
       <h2 id="program-title">The Program</h2>
     </div>
     <div class="program-list">
+      <button class="program-item" type="button" data-detail="detail-altar">
+        <span class="program-time">all day</span>
+        <span class="program-name">Altar</span>
+      </button>
+
       <button class="program-item" type="button" data-detail="detail-macario">
         <span class="program-time">16:00</span>
         <span class="program-name">Film · Macario</span>
@@ -955,7 +969,7 @@ body{
       </button>
       <button class="program-item" type="button" data-detail="detail-monologue">
         <span class="program-time">20:00</span>
-        <span class="program-name">Monologue at the communal altar</span>
+        <span class="program-name">Monologue</span>
       </button>
       <button class="program-item" type="button" data-detail="detail-olivia">
         <span class="program-time">21:00</span>
@@ -974,6 +988,13 @@ body{
     <div class="program-dialog-content"></div>
   </div>
 </dialog>
+
+<template id="detail-altar">
+  <article class="program-detail">
+    <h2>Altar</h2>
+    <p>We offer our dead the food and drinks they deserve. Feel free to bring whatever you wish, along with a photograph of whoever you want to honor.</p>
+  </article>
+</template>
 
 <template id="detail-macario">
   <article class="program-detail">
@@ -1011,7 +1032,7 @@ body{
 <template id="detail-monologue">
   <article class="program-detail">
     <h2>Monologue</h2>
-    <p>Bring a photograph, a food they loved, drinks, cigarettes, a candle, flowers, a cat, or anything else that reminds you of them.</p>
+    <p>We all gather at the altar to honor our departed loved ones.</p>
   </article>
 </template>
 
