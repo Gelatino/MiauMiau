@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lights We Share — Artists · Day of the Dead</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Barlow+Condensed:wght@400;500;600;700&display=swap');
+:root{--ink:#0D0906;--paper:#F1E4C6;--marigold:#F2A900;--marigold-light:#FFC94A;--pink:#E5417C;--candle:#FFDFA0;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--ink);color:var(--paper);font-family:'Barlow Condensed',sans-serif;font-weight:500;line-height:1.5;}
+body:has(dialog[open]){overflow:hidden;}
+.candles{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:1;transition:opacity 2.8s ease-out;}
+.candles.is-scrolling{opacity:.28;transition-duration:.2s;}
+.candle-dot{position:absolute;width:8px;height:8px;background:transparent;border-radius:50%;opacity:.6;transform-origin:center;animation:flicker var(--flicker-duration,4s) ease-in-out infinite var(--flicker-delay,0s);}
+.candle-dot::before{content:"";position:absolute;inset:-22px;border-radius:50%;background:radial-gradient(circle,rgba(255,223,160,.38) 0%,rgba(242,169,0,.18) 34%,rgba(242,169,0,0) 72%);filter:blur(7px);opacity:.7;animation:halo-pulse 5.2s ease-in-out infinite var(--flicker-delay,0s);}
+.candle-dot::after{content:"";position:absolute;inset:2px;border-radius:50%;background:#fff1c9;box-shadow:0 0 4px 2px rgba(255,223,160,.55);}
+@keyframes halo-pulse{0%,100%{opacity:.66;transform:scale(.94);}50%{opacity:.82;transform:scale(1.06);}}
+@keyframes flicker{0%,100%{opacity:.72;transform:scale(.98);}30%{opacity:.82;transform:scale(1.03);}52%{opacity:.69;transform:scale(.97);}76%{opacity:.8;transform:scale(1.02);}}
+a{color:var(--marigold-light);text-underline-offset:4px;overflow-wrap:anywhere;}
+a:hover{color:var(--pink);}
+a:focus-visible,button:focus-visible{outline:2px solid var(--marigold-light);outline-offset:4px;}
+.program-section{position:relative;z-index:1;min-height:100svh;padding:40px 24px 72px;}
+.program-card{width:min(100%,820px);margin:auto;}
+.back-link{display:inline-block;margin-bottom:40px;font-size:1.2rem;}
+.program-heading{margin-bottom:36px;text-align:center;}
+.program-heading h1{font-size:3.5rem;line-height:1.1;font-weight:700;}
+.program-heading p{margin-top:12px;color:var(--marigold-light);font-size:1.35rem;}
+.program-list{display:grid;gap:8px;}
+.program-item{width:100%;display:grid;grid-template-columns:48px minmax(0,1fr) 24px;align-items:center;gap:20px;min-height:84px;padding:20px 14px;color:var(--paper);text-align:left;font:inherit;background:transparent;border:0;cursor:pointer;}
+.program-number{color:var(--marigold-light);font-size:1.54rem;font-weight:700;font-variant-numeric:tabular-nums;}
+.program-name{font-size:1.815rem;line-height:1.25;overflow-wrap:anywhere;transition:color 180ms ease;}
+.program-item:hover .program-name{color:var(--marigold-light);}
+.program-arrow{color:var(--marigold);font-size:1.7rem;}
+.program-dialog{position:fixed;inset:0;margin:auto;width:min(92vw,760px);max-width:none;max-height:90svh;padding:0;overflow:auto;color:var(--paper);background:var(--ink);border:1px solid #F1E4C633;}
+.program-dialog::backdrop{background:rgba(0,0,0,.65);backdrop-filter:blur(10px);}
+.dialog-toolbar{position:sticky;top:0;display:flex;justify-content:flex-end;padding:12px 12px 0;background:var(--ink);}
+.close-button{width:44px;height:44px;color:var(--paper);background:transparent;border:0;font:inherit;font-size:2rem;cursor:pointer;}
+.program-detail{padding:0 36px 36px;}
+.program-detail h2{margin:0 0 24px;color:var(--marigold-light);font-family:'Playfair Display',serif;font-size:2.1rem;line-height:1.2;overflow-wrap:anywhere;}
+.contact-links{display:flex;flex-wrap:wrap;gap:8px 20px;margin-bottom:28px;font-size:1.2rem;}
+.program-detail h3{margin:28px 0 10px;color:var(--marigold-light);font-size:1.35rem;font-weight:600;}
+.biography{white-space:pre-line;}
+.program-detail p,.artworks{font-size:1.25rem;line-height:1.65;overflow-wrap:anywhere;}
+.artworks{padding-left:24px;}
+.artworks li+li{margin-top:12px;}
+.payment-pending{color:var(--paper);opacity:.7;}
+@media(max-width:600px){
+  .program-section{padding:24px 20px 48px;}
+  .back-link{margin-bottom:32px;}
+  .program-heading h1{font-size:2.75rem;}
+  .program-item{grid-template-columns:28px minmax(0,1fr) 20px;gap:12px;padding:17px 4px;}
+  .program-number{font-size:1.265rem;}
+  .program-name{font-size:1.5rem;}
+  .program-detail{padding:0 20px 28px;}
+  .program-detail h2{font-size:1.8rem;}
+}
+@media(prefers-reduced-motion:reduce){
+  .program-name{transition:none;}
+  .candle-dot,.candle-dot::before,.candles{animation:none;}
+  .candles,.candles.is-scrolling{opacity:1;transition:none;}
+}
+</style>
+</head>
+<body>
+<div class="candles" id="candles" aria-hidden="true"></div>
+<main class="program-section">
+  <div class="program-card">
+    <a class="back-link" href="../../diademuertos.html">&#8592; Day of the Dead</a>
+    <header class="program-heading">
+      <h1>Lights We Share</h1>
+      <p>The Artists · Candleholder Exhibition · 31 October 2026</p>
+    </header>
+    <div class="program-list" aria-label="Exhibition artists"></div>
+    <noscript><p>Please enable JavaScript to view the artist directory.</p></noscript>
+  </div>
+</main>
+<dialog class="program-dialog" aria-labelledby="artist-title">
+  <div class="dialog-toolbar">
+    <button class="close-button" type="button" aria-label="Close artist details" title="Close">&#215;</button>
+  </div>
+  <article class="program-detail">
+    <h2 id="artist-title"></h2>
+    <div class="contact-links"></div>
+    <h3>About the artist</h3>
+    <p class="biography"></p>
+    <h3>Artworks</h3>
+    <ul class="artworks"></ul>
+    <h3>PayPal</h3>
+    <p class="payment"></p>
+  </article>
+</dialog>
+<script>
+const candleContainer = document.getElementById('candles');
+const lightPositions = [
+  [5,20],[10,55],[15,35],[20,70],[25,15],[30,60],[35,40],[40,80],
+  [45,25],[50,50],[55,10],[60,65],[65,30],[70,75],[75,45],[80,20],
+  [85,58],[90,35],[95,68],[8,85],[92,12],[48,88],[18,8],[62,92],
+  [38,5],[72,55],[28,45],[82,80],[12,65],[58,25]
+];
+const lightMultiplier = 2;
+lightPositions.forEach((position,index)=>{
+  for(let copy = 0; copy < lightMultiplier; copy++){
+    const lightIndex = index + copy * lightPositions.length;
+    const light = document.createElement('div');
+    const yOffset = copy % 2 === 1 ? (index % 2 === 0 ? 2.5 : -2.5) : 0;
+    light.className = 'candle-dot';
+    light.style.left = `${Math.min(97,position[0] + copy * 2.8)}%`;
+    light.style.top = `${Math.max(2,Math.min(96,position[1] + yOffset))}%`;
+    light.style.setProperty('--flicker-delay', `${(lightIndex*0.17).toFixed(2)}s`);
+    light.style.setProperty('--flicker-duration', `${(3.6 + (lightIndex%5)*0.4).toFixed(1)}s`);
+    candleContainer.appendChild(light);
+  }
+});
+
+if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  let scrollTimer;
+  window.addEventListener('scroll',()=>{
+    candleContainer.classList.add('is-scrolling');
+    window.clearTimeout(scrollTimer);
+    scrollTimer = window.setTimeout(()=>candleContainer.classList.remove('is-scrolling'),220);
+  },{passive:true});
+}
+
+const artists = [
+  {
+    name: 'Chiara Corbella',
+    email: 'chiara.corbella97@gmail.com',
+    links: [{label: '@petitexhiara', url: 'https://www.instagram.com/petitexhiara/'}],
+    biography: 'I’m a multimedia artist from Milano. I work across illustration, ceramics and fiber arts. To me art means embracing imperfection and finding release in an overwhelming reality. I often get inspired by everyday objects or nostalgic elements, reimagining them through my craft. Art taught me how to cherish my solitude!',
+    artworks: ['Creature N. 1 — Stoneware, 2025, 12 × 18 × 18 cm — €80'],
+    paypal: ''
+  },
+  {
+    name: 'Daria Grib',
+    email: 'gribdariaceramic@gmail.com',
+    links: [{label: '@pilz_ceramic', url: 'https://www.instagram.com/pilz_ceramic/'}],
+    biography: 'Ich bin Keramikkünstlerin und arbeite in verschiedenen Techniken mit Ton und Porzellan. Mir ist wichtig, dass man meine Objekte und mein Geschirr gern in die Hand nimmt und berühren möchte. Am liebsten gestalte ich Gebrauchskeramik: Dinge für den Alltag, die den Menschen jeden Tag ein Stück Freude schenken.',
+    artworks: ['Schädel (weiß) — Porzellan, 25 × 10 × 12 cm — €50', 'Schädel (schwarz) — Porzellan, 25 × 10 × 12 cm — €50', 'Schwarze Katze — Stoneware, 5 × 5 × 12 cm — €20'],
+    paypal: ''
+  },
+  {
+    name: 'Emily Morey',
+    email: 'emilymoreyartwork@gmail.com',
+    links: [{label: '@emilymoreypaintings', url: 'https://www.instagram.com/emilymoreypaintings/'}, {label: '@emily__ceramics', url: 'https://www.instagram.com/emily__ceramics/'}, {label: 'emilymoreyart.com', url: 'https://www.emilymoreyart.com/'}],
+    biography: 'Emily Morey is a British artist from London, based in Berlin. Her ceramic candle holders originally grew from her drawings and paintings, emerging through a process of organically inventing and transforming imagery. Beginning with an idea, she allows forms to develop intuitively, combining fragments of the body, objects and imagined shapes and seeing where they lead. In the candle holders, feet and high heels become exaggerated, sculptural forms, drawing on the glamour and playful excess of 1970s fashion.\n\nHand-built and individually formed, the ceramics carry the immediacy and irregularity of drawing and painting into three dimensions. The resulting objects sit somewhere between sculpture, ornament and the everyday, bringing the invented forms of Morey’s visual world into physical space.',
+    artworks: ['Don’t step on my blue suede shoes — Elvis ceramic shoe candle holder, 2026, 7 × 10 × 3 cm — €45', 'Swan — Ceramic candle holder, 7 × 20 × 6 cm — €60', 'Red velvet heel — 10 × 18 × 7 cm — €60'],
+    paypal: ''
+  },
+  {
+    name: 'Lizeth Rodríguez Avila (Dot)',
+    email: 'future@liz-dot.com',
+    links: [{label: '@dot_pieces', url: 'https://www.instagram.com/dot_pieces/'}, {label: 'liz-dot.com', url: 'https://liz-dot.com/'}],
+    biography: 'Lizeth Rodríguez Ávila (Ciudad de México, 1988) multidisciplinary artist and creative director based in Berlin. Rooted in an interest in materia as a living archive, I approach objects as carriers of memory and ritual. Researching about mythology, archaeology, dreams, and the strange emotional lives we project onto things.',
+    artworks: ['Ritual Bat Candle holder — Stoneware, 2025, 16 × 15 × 15 cm — €300'],
+    paypal: ''
+  },
+  {
+    name: 'Anastasiia Khitsenko',
+    email: 'yasyahits@gmail.com',
+    links: [{label: '@shozaceramics', url: 'https://www.instagram.com/shozaceramics/'}],
+    biography: 'I’m a Ukrainian multidisciplinary artist. In my works i want to share my self exploration and childhood memories that built my character',
+    artworks: ['Swan candle holder — Stoneware, 2025 — €35'],
+    paypal: ''
+  },
+  {
+    name: 'Sonia Alcaina Gallardo',
+    email: 'Sonia.alcaina@gmail.com',
+    links: [{label: '@sonialcaina', url: 'https://www.instagram.com/sonialcaina/'}],
+    biography: 'Originally from Andalusia, Spain, and based in Berlin for the past fourteen years, Sonia Alcaina Gallardo holds a Bachelor’s degree in Fine Arts and a Master’s degree in Art Teaching from the University of Salamanca. Her academic background also includes a Master’s thesis in World Heritage Studies, in which she explored the role of contemporary art photography in the production and conceptualisation of cultural heritage.\n\nHer current practice centres on photography, while she is also developing her work in ceramics, exploring textures and organic forms in both functional and non-functional pieces. Her ceramic practice investigates the interplay between materiality, tactile qualities, and the combination of clay with other materials, embracing an experimental approach to form and surface.\n\nAlongside her artistic practice, she shares her life with her two Sphynx cats.\n\nShe is a frequent contributor to Curated By Girls, a project dedicated to promoting diversity and equality in the arts by showcasing emerging artists, with a particular focus on female-identifying creators.',
+    artworks: ['Candleholder 1 — Stoneware, 2025, ca. 15 cm, 10 cm diameter — €40', 'Candleholder 2 — Stoneware, 2025, ca. 10 cm, 7 cm diameter — €30'],
+    paypal: ''
+  },
+  {
+    name: 'Pranay Agrawal',
+    email: 'pranay.agrawal0795@gmail.com',
+    links: [{label: '@Potterybypranay', url: 'https://www.instagram.com/potterybypranay/'}],
+    biography: 'I’m Pranay, originally from India and currently based in Berlin. For me, ceramics is a way to slow down, be present, and turn simple ideas into unique, tangible pieces that carry a little bit of my personality.',
+    artworks: ['3 artworks — Stoneware, 5 × 9 cm'],
+    paypal: ''
+  },
+  {
+    name: 'Zuzia Monsiorska',
+    email: 'z.monsiorska@gmail.com',
+    links: [{label: '@zuz.monsiorska', url: 'https://www.instagram.com/zuz.monsiorska/'}],
+    biography: 'I’m a Polish artist currently living in Berlin, where I work as a graphic designer as well as an illustrator.\n\nIn recent years, I’ve also been creating ceramics, decorating each piece with my own illustrations. Celestial motifs such as suns, stars and moons are often featured in my works. I’m drawn to pure shapes, pronounced contours and vibrant colours. I put a lot of time and care into each piece, so they all turn out unique!',
+    artworks: ['Stars & Moons Candleholder — Stoneware, for 7 candles, 2025, 12 × 20 × 3 cm — €120', 'Seven Flames Candleholder — Stoneware, for 7 candles, 2024, 12 × 20 × 3 cm — Not for sale'],
+    paypal: ''
+  },
+  {
+    name: 'Claylie Studio',
+    email: 'cleliebocquet@gmail.com',
+    links: [{label: '@claylie.studio', url: 'https://www.instagram.com/claylie.studio/'}],
+    biography: 'My name is Clélie, I’m a French ceramicist who recently moved to Berlin. I use both handbuilding and wheel throwing techniques. My work is inspired by my day-to-day life and the little moments that are actually big. I aim to add more whimsy into other people\'s life by making mindful pieces that bring them peace, comfort and happiness.',
+    artworks: ['Mini cup + plate — Colored stoneware, 2026, 4 × 3 × 3 — €12', 'Melted sea glass onto plate — Stoneware, glazed fired with pieces of sea glass, 2026, 4 × 14 × 14 — €22', 'Blue grey plate — Stoneware, 2026, 3 × 10 × 10 — €16', 'Small blue plate — Stoneware, 2026, 2 × 7 × 7 — €8', 'Blue polka dots donut — Stoneware, 2026, 5 × 13 × 13 — €24', 'Small brown cup — Stoneware, 2026, 5 × 4 × 4 — €7'],
+    paypal: ''
+  },
+  {
+    name: 'Przemysław Gołębiewski / LELEK studio',
+    email: 'przemyslawgolebiewski4@gmail.com',
+    links: [{label: '@lelek.studio_', url: 'https://www.instagram.com/lelek.studio_/'}],
+    biography: 'Przemysław Gołębiewski is a self-taught artist working with clay, based in Berlin. His practice explores the relationship between intuition, material and form, situated at the intersection of sculpture, functional objects and contemporary art.\n\nRaised in the Kuyavian-Pomeranian region of Poland, surrounded by peatlands and open landscapes, Gołębiewski developed an enduring connection with nature. Its influence is reflected not through direct representation, but in his interest in organic structures, irregularity and the transformative processes of natural materials.\n\nIntuition is central to his artistic process. Working directly with clay, Gołębiewski allows forms to emerge through gesture and material interaction, often before they are fully conceived. This approach exists alongside a more deliberate practice of designing collections, creating a dialogue between spontaneous discovery and conscious composition.\n\nMaterial variations, surface marks and traces of making remain visible in his work. Rather than seeking uniformity, he embraces the individuality of each piece and the unexpected outcomes of the process.\n\nHis practice considers form as something that is not always predetermined, but discovered through the encounter between hand, material and intention.',
+    artworks: ['CHO - 001 — Stoneware, 2026, 27 cm — €120'],
+    paypal: ''
+  }
+];
+
+const artistList = document.querySelector('.program-list');
+const artistDialog = document.querySelector('.program-dialog');
+let lastTrigger = null;
+
+function createLink(label, url){
+  const link = document.createElement('a');
+  link.textContent = label;
+  link.href = url;
+  if(url.startsWith('https://')){
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+  }
+  return link;
+}
+
+artists.forEach((artist, index)=>{
+  const button = document.createElement('button');
+  button.className = 'program-item';
+  button.type = 'button';
+  button.setAttribute('aria-haspopup', 'dialog');
+  const number = document.createElement('span');
+  number.className = 'program-number';
+  number.setAttribute('aria-hidden', 'true');
+  number.textContent = String(index + 1).padStart(2, '0');
+  const name = document.createElement('span');
+  name.className = 'program-name';
+  name.textContent = artist.name;
+  const arrow = document.createElement('span');
+  arrow.className = 'program-arrow';
+  arrow.setAttribute('aria-hidden', 'true');
+  arrow.textContent = '↗';
+  button.append(number, name, arrow);
+  button.addEventListener('click',()=>{
+    document.getElementById('artist-title').textContent = artist.name;
+    document.querySelector('.contact-links').replaceChildren(
+      createLink(artist.email, 'mailto:' + artist.email),
+      ...artist.links.map(link=>createLink(link.label, link.url))
+    );
+    document.querySelector('.biography').textContent = artist.biography;
+    document.querySelector('.artworks').replaceChildren(...artist.artworks.map(artwork=>{
+      const item = document.createElement('li');
+      item.textContent = artwork;
+      return item;
+    }));
+    const payment = document.querySelector('.payment');
+    payment.classList.toggle('payment-pending', !artist.paypal);
+    payment.replaceChildren(artist.paypal ? createLink('Pay with PayPal', artist.paypal) : document.createTextNode('PayPal link coming soon.'));
+    lastTrigger = button;
+    artistDialog.showModal();
+    artistDialog.scrollTop = 0;
+  });
+  artistList.append(button);
+});
+
+document.querySelector('.close-button').addEventListener('click',()=>artistDialog.close());
+artistDialog.addEventListener('click',event=>{
+  const bounds = artistDialog.getBoundingClientRect();
+  if(event.target === artistDialog && (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom)) artistDialog.close();
+});
+artistDialog.addEventListener('close',()=>lastTrigger?.focus());
+</script>
+</body>
+</html>
