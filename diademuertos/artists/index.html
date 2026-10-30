@@ -45,6 +45,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--marigold-light);out
 .artworks{padding-left:24px;}
 .artworks li+li{margin-top:12px;}
 .payment-pending{color:var(--paper);opacity:.7;}
+.paypal-image-link{display:block;width:min(100%,300px);margin-bottom:16px;}
+.paypal-image{display:block;width:100%;height:auto;background:#fff;}
 @media(max-width:600px){
   .program-section{padding:24px 20px 48px;}
   .back-link{margin-bottom:32px;}
@@ -82,10 +84,14 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--marigold-light);out
   <article class="program-detail">
     <h2 id="artist-title"></h2>
     <div class="contact-links"></div>
-    <h3>About the artist</h3>
-    <p class="biography"></p>
-    <h3>Artworks</h3>
-    <ul class="artworks"></ul>
+    <section class="biography-section">
+      <h3>About the artist</h3>
+      <p class="biography"></p>
+    </section>
+    <section class="artworks-section">
+      <h3>Artworks</h3>
+      <ul class="artworks"></ul>
+    </section>
     <h3>PayPal</h3>
     <p class="payment"></p>
   </article>
@@ -129,6 +135,7 @@ const artists = [
     links: [{label: '@petitexhiara', url: 'https://www.instagram.com/petitexhiara/'}],
     biography: 'I’m a multimedia artist from Milano. I work across illustration, ceramics and fiber arts. To me art means embracing imperfection and finding release in an overwhelming reality. I often get inspired by everyday objects or nostalgic elements, reimagining them through my craft. Art taught me how to cherish my solitude!',
     artworks: ['Creature N. 1 — Stoneware, 2025, 12 × 18 × 18 cm — €80'],
+    paypalImage: ' Chiara Corbella.jpeg',
     paypal: ''
   },
   {
@@ -137,6 +144,7 @@ const artists = [
     links: [{label: '@pilz_ceramic', url: 'https://www.instagram.com/pilz_ceramic/'}],
     biography: 'Ich bin Keramikkünstlerin und arbeite in verschiedenen Techniken mit Ton und Porzellan. Mir ist wichtig, dass man meine Objekte und mein Geschirr gern in die Hand nimmt und berühren möchte. Am liebsten gestalte ich Gebrauchskeramik: Dinge für den Alltag, die den Menschen jeden Tag ein Stück Freude schenken.',
     artworks: ['Schädel (weiß) — Porzellan, 25 × 10 × 12 cm — €50', 'Schädel (schwarz) — Porzellan, 25 × 10 × 12 cm — €50', 'Schwarze Katze — Stoneware, 5 × 5 × 12 cm — €20'],
+    paypalImage: 'Daria Grib.jpg',
     paypal: ''
   },
   {
@@ -145,6 +153,7 @@ const artists = [
     links: [{label: '@emilymoreypaintings', url: 'https://www.instagram.com/emilymoreypaintings/'}, {label: '@emily__ceramics', url: 'https://www.instagram.com/emily__ceramics/'}, {label: 'emilymoreyart.com', url: 'https://www.emilymoreyart.com/'}],
     biography: 'Emily Morey is a British artist from London, based in Berlin. Her ceramic candle holders originally grew from her drawings and paintings, emerging through a process of organically inventing and transforming imagery. Beginning with an idea, she allows forms to develop intuitively, combining fragments of the body, objects and imagined shapes and seeing where they lead. In the candle holders, feet and high heels become exaggerated, sculptural forms, drawing on the glamour and playful excess of 1970s fashion.\n\nHand-built and individually formed, the ceramics carry the immediacy and irregularity of drawing and painting into three dimensions. The resulting objects sit somewhere between sculpture, ornament and the everyday, bringing the invented forms of Morey’s visual world into physical space.',
     artworks: ['Don’t step on my blue suede shoes — Elvis ceramic shoe candle holder, 2026, 7 × 10 × 3 cm — €45', 'Swan — Ceramic candle holder, 7 × 20 × 6 cm — €60', 'Red velvet heel — 10 × 18 × 7 cm — €60'],
+    paypalImage: 'IMG_7310 - Emily Morey.png',
     paypal: ''
   },
   {
@@ -153,6 +162,7 @@ const artists = [
     links: [{label: '@dot_pieces', url: 'https://www.instagram.com/dot_pieces/'}, {label: 'liz-dot.com', url: 'https://liz-dot.com/'}],
     biography: 'Lizeth Rodríguez Ávila (Ciudad de México, 1988) multidisciplinary artist and creative director based in Berlin. Rooted in an interest in materia as a living archive, I approach objects as carriers of memory and ritual. Researching about mythology, archaeology, dreams, and the strange emotional lives we project onto things.',
     artworks: ['Ritual Bat Candle holder — Stoneware, 2025, 16 × 15 × 15 cm — €300'],
+    paypalImage: 'qrcode - Liz Rod.png',
     paypal: ''
   },
   {
@@ -161,6 +171,7 @@ const artists = [
     links: [{label: '@shozaceramics', url: 'https://www.instagram.com/shozaceramics/'}],
     biography: 'I’m a Ukrainian multidisciplinary artist. In my works i want to share my self exploration and childhood memories that built my character',
     artworks: ['Swan candle holder — Stoneware, 2025 — €35'],
+    paypalImage: 'IMG_7934 - Anastasiia Khitsenko.png',
     paypal: ''
   },
   {
@@ -169,6 +180,7 @@ const artists = [
     links: [{label: '@sonialcaina', url: 'https://www.instagram.com/sonialcaina/'}],
     biography: 'Originally from Andalusia, Spain, and based in Berlin for the past fourteen years, Sonia Alcaina Gallardo holds a Bachelor’s degree in Fine Arts and a Master’s degree in Art Teaching from the University of Salamanca. Her academic background also includes a Master’s thesis in World Heritage Studies, in which she explored the role of contemporary art photography in the production and conceptualisation of cultural heritage.\n\nHer current practice centres on photography, while she is also developing her work in ceramics, exploring textures and organic forms in both functional and non-functional pieces. Her ceramic practice investigates the interplay between materiality, tactile qualities, and the combination of clay with other materials, embracing an experimental approach to form and surface.\n\nAlongside her artistic practice, she shares her life with her two Sphynx cats.\n\nShe is a frequent contributor to Curated By Girls, a project dedicated to promoting diversity and equality in the arts by showcasing emerging artists, with a particular focus on female-identifying creators.',
     artworks: ['Candleholder 1 — Stoneware, 2025, ca. 15 cm, 10 cm diameter — €40', 'Candleholder 2 — Stoneware, 2025, ca. 10 cm, 7 cm diameter — €30'],
+    paypalImage: 'IMG_0870 - Sonia A..jpeg',
     paypal: ''
   },
   {
@@ -177,6 +189,7 @@ const artists = [
     links: [{label: '@Potterybypranay', url: 'https://www.instagram.com/potterybypranay/'}],
     biography: 'I’m Pranay, originally from India and currently based in Berlin. For me, ceramics is a way to slow down, be present, and turn simple ideas into unique, tangible pieces that carry a little bit of my personality.',
     artworks: ['3 artworks — Stoneware, 5 × 9 cm'],
+    paypalImage: 'IMG_1737 - Pranay agrawal.jpeg',
     paypal: ''
   },
   {
@@ -185,6 +198,7 @@ const artists = [
     links: [{label: '@zuz.monsiorska', url: 'https://www.instagram.com/zuz.monsiorska/'}],
     biography: 'I’m a Polish artist currently living in Berlin, where I work as a graphic designer as well as an illustrator.\n\nIn recent years, I’ve also been creating ceramics, decorating each piece with my own illustrations. Celestial motifs such as suns, stars and moons are often featured in my works. I’m drawn to pure shapes, pronounced contours and vibrant colours. I put a lot of time and care into each piece, so they all turn out unique!',
     artworks: ['Stars & Moons Candleholder — Stoneware, for 7 candles, 2025, 12 × 20 × 3 cm — €120', 'Seven Flames Candleholder — Stoneware, for 7 candles, 2024, 12 × 20 × 3 cm — Not for sale'],
+    paypalImage: 'paypal - Zuzanna Monsiorska.jpg',
     paypal: ''
   },
   {
@@ -193,6 +207,7 @@ const artists = [
     links: [{label: '@claylie.studio', url: 'https://www.instagram.com/claylie.studio/'}],
     biography: 'My name is Clélie, I’m a French ceramicist who recently moved to Berlin. I use both handbuilding and wheel throwing techniques. My work is inspired by my day-to-day life and the little moments that are actually big. I aim to add more whimsy into other people\'s life by making mindful pieces that bring them peace, comfort and happiness.',
     artworks: ['Mini cup + plate — Colored stoneware, 2026, 4 × 3 × 3 — €12', 'Melted sea glass onto plate — Stoneware, glazed fired with pieces of sea glass, 2026, 4 × 14 × 14 — €22', 'Blue grey plate — Stoneware, 2026, 3 × 10 × 10 — €16', 'Small blue plate — Stoneware, 2026, 2 × 7 × 7 — €8', 'Blue polka dots donut — Stoneware, 2026, 5 × 13 × 13 — €24', 'Small brown cup — Stoneware, 2026, 5 × 4 × 4 — €7'],
+    paypalImage: 'PayPal QR code Clelie BOCQUET - BOCQUET Clélie.jpg',
     paypal: ''
   },
   {
@@ -201,6 +216,25 @@ const artists = [
     links: [{label: '@lelek.studio_', url: 'https://www.instagram.com/lelek.studio_/'}],
     biography: 'Przemysław Gołębiewski is a self-taught artist working with clay, based in Berlin. His practice explores the relationship between intuition, material and form, situated at the intersection of sculpture, functional objects and contemporary art.\n\nRaised in the Kuyavian-Pomeranian region of Poland, surrounded by peatlands and open landscapes, Gołębiewski developed an enduring connection with nature. Its influence is reflected not through direct representation, but in his interest in organic structures, irregularity and the transformative processes of natural materials.\n\nIntuition is central to his artistic process. Working directly with clay, Gołębiewski allows forms to emerge through gesture and material interaction, often before they are fully conceived. This approach exists alongside a more deliberate practice of designing collections, creating a dialogue between spontaneous discovery and conscious composition.\n\nMaterial variations, surface marks and traces of making remain visible in his work. Rather than seeking uniformity, he embraces the individuality of each piece and the unexpected outcomes of the process.\n\nHis practice considers form as something that is not always predetermined, but discovered through the encounter between hand, material and intention.',
     artworks: ['CHO - 001 — Stoneware, 2026, 27 cm — €120'],
+    paypalImage: 'paypal_qr_1791441609059 - Gołębiewski Przemysław.png',
+    paypal: ''
+  },
+  {
+    name: 'Aneth Reyes',
+    email: '',
+    links: [{label: '@embarra.ceramics', url: 'https://www.instagram.com/embarra.ceramics/'}],
+    biography: '',
+    artworks: [],
+    paypalImage: 'Aneth Reyes.jpeg',
+    paypal: ''
+  },
+  {
+    name: 'Miguel Guzman',
+    email: '',
+    links: [{label: '@goma.pottery', url: 'https://www.instagram.com/goma.pottery/'}],
+    biography: '',
+    artworks: [],
+    paypalImage: 'Miguel Guzman.jpeg',
     paypal: ''
   }
 ];
@@ -240,18 +274,36 @@ artists.forEach((artist, index)=>{
   button.addEventListener('click',()=>{
     document.getElementById('artist-title').textContent = artist.name;
     document.querySelector('.contact-links').replaceChildren(
-      createLink(artist.email, 'mailto:' + artist.email),
+      ...(artist.email ? [createLink(artist.email, 'mailto:' + artist.email)] : []),
       ...artist.links.map(link=>createLink(link.label, link.url))
     );
+    document.querySelector('.biography-section').hidden = !artist.biography;
     document.querySelector('.biography').textContent = artist.biography;
+    document.querySelector('.artworks-section').hidden = !artist.artworks.length;
     document.querySelector('.artworks').replaceChildren(...artist.artworks.map(artwork=>{
       const item = document.createElement('li');
       item.textContent = artwork;
       return item;
     }));
     const payment = document.querySelector('.payment');
-    payment.classList.toggle('payment-pending', !artist.paypal);
-    payment.replaceChildren(artist.paypal ? createLink('Pay with PayPal', artist.paypal) : document.createTextNode('PayPal link coming soon.'));
+    payment.classList.toggle('payment-pending', !artist.paypal && !artist.paypalImage);
+    payment.replaceChildren();
+    if(artist.paypalImage){
+      const imageUrl = '../../img/diademuertos/Artists%20Paypal/' + encodeURIComponent(artist.paypalImage);
+      const imageLink = createLink('', imageUrl);
+      imageLink.className = 'paypal-image-link';
+      imageLink.target = '_blank';
+      imageLink.rel = 'noopener noreferrer';
+      imageLink.title = 'Open full-size PayPal QR code';
+      const image = document.createElement('img');
+      image.className = 'paypal-image';
+      image.src = imageUrl;
+      image.alt = 'PayPal payment QR code for ' + artist.name;
+      imageLink.append(image);
+      payment.append(imageLink);
+    }
+    if(artist.paypal) payment.append(createLink('Pay with PayPal', artist.paypal));
+    if(!artist.paypal && !artist.paypalImage) payment.append(document.createTextNode('PayPal link coming soon.'));
     lastTrigger = button;
     artistDialog.showModal();
     artistDialog.scrollTop = 0;
